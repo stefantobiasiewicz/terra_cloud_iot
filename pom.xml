@@ -6,7 +6,7 @@
         <groupId>pl.terra</groupId>
         <artifactId>generator</artifactId>
         <version>0.0.1</version>
-        <relativePath>generator/generator.xml</relativePath><!-- lookup parent from repository -->
+        <relativePath>generator/pom-generator.xml</relativePath><!-- lookup parent from repository -->
     </parent>
 
     <artifactId>cloud_iot</artifactId>
@@ -15,7 +15,6 @@
 
     <properties>
         <java.version>17</java.version>
-        <openApiInputSpec>generator/api.yaml</openApiInputSpec>
     </properties>
     <dependencies>
         <dependency>
