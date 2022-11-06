@@ -1,0 +1,7 @@
+{
+  "messageId": 1,
+  "type": "LightCmd",
+  "payload": {
+    "onOff": true
+  }
+}

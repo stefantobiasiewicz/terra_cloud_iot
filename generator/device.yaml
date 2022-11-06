@@ -9,10 +9,26 @@ paths: {}
 
 components:
   schemas:
-    DeviceMessage:
+    LightCmd:
       type: object
       properties:
-        spec:
+        onOff:
+          type: boolean
+    EnvInfo:
+      type: object
+      properties:
+        temperature:
+          type: number
+        humidity:
+          type: number
+        pressure:
+          type: number
+    MqttMessage:
+      type: object
+      properties:
+        messageId:
           type: integer
-        next:
+        type:
           type: string
+        payload:
+          type: object
