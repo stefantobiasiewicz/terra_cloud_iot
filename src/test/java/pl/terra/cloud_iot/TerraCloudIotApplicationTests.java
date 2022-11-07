@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.terra.device.model.LightCmd;
-import pl.terra.device.model.MqttMessage;
+import pl.terra.device.model.MqttSystemMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +23,7 @@ class TerraCloudIotApplicationTests {
         final ObjectMapper mapper = new ObjectMapper();
 
         final File json = new File("src/test/resources/ExcampleMessage.json");
-        final MqttMessage message = mapper.readValue(json, MqttMessage.class);
+        final MqttSystemMessage message = mapper.readValue(json, MqttSystemMessage.class);
 
         Assertions.assertEquals(1, message.getMessageId());
 

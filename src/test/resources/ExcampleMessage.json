@@ -1,6 +1,6 @@
 {
   "messageId": 1,
-  "type": "LightCmd",
+  "type": "LIGHT_CMD",
   "payload": {
     "onOff": true
   }

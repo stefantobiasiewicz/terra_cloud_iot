@@ -9,6 +9,9 @@ paths: {}
 
 components:
   schemas:
+    ModelDouble:
+      type: number
+      format: double
     LightCmd:
       type: object
       properties:
@@ -18,17 +21,21 @@ components:
       type: object
       properties:
         temperature:
-          type: number
+          $ref: '#/components/schemas/ModelDouble'
         humidity:
-          type: number
+          $ref: '#/components/schemas/ModelDouble'
         pressure:
-          type: number
-    MqttMessage:
+          $ref: '#/components/schemas/ModelDouble'
+    MessageType:
+      type: string
+      enum: [ PING, OK, ERROR, ENV_INFO, LIGHT_CMD ]
+    MqttSystemMessage:
       type: object
       properties:
         messageId:
           type: integer
+          format: int64
         type:
-          type: string
+          $ref: '#/components/schemas/MessageType'
         payload:
           type: object
