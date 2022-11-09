@@ -1,10 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Title
-  description: Title
+  title: Cloud-iot
+  description: Api definition for cloud iot service
   version: 1.0.0
-servers:
-  - url: 'https'
 paths: {}
 
 components:

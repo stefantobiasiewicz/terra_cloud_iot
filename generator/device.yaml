@@ -1,10 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Title
-  description: Title
+  title: Mqtt messages defininition
+  description: Definition of messages running between service and device over mqtt
   version: 1.0.0
-servers:
-  - url: 'https'
 paths: {}
 
 components:
