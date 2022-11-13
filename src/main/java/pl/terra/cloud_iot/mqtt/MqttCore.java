@@ -26,9 +26,9 @@ public class MqttCore implements MqttCallback {
     private final int qos = 0;
 
     private final MqttClient client;
-    private final List<Device> devices = new ArrayList<>();
+    private final List<Device> registeredDevices = new ArrayList<>();
 
-    final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
     private final Map<Long, MqttSystemMessage> messageMap = new HashMap<>();
 
 
@@ -58,7 +58,7 @@ public class MqttCore implements MqttCallback {
 
     private void checkDevice(final Device device) throws SystemException {
         Arguments.isNull(device, "device");
-        if (!devices.contains(device)) {
+        if (!registeredDevices.contains(device)) {
             final String message = String.format("can't find device: '%s' in added device list.", device);
             MqttCore.logger.error(message);
             throw new SystemException(message);
@@ -76,7 +76,7 @@ public class MqttCore implements MqttCallback {
             throw new SystemException(message);
         }
 
-        devices.add(device);
+        registeredDevices.add(device);
     }
 
     public void remove(final Device device) throws SystemException {
@@ -90,7 +90,7 @@ public class MqttCore implements MqttCallback {
             throw new SystemException(message);
         }
 
-        devices.remove(device);
+        registeredDevices.remove(device);
     }
 
     private void publish(final String topic, final MqttSystemMessage mqttSystemMessage) throws SystemException {
