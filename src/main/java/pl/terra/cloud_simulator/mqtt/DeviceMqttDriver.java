@@ -2,12 +2,10 @@ package pl.terra.cloud_simulator.mqtt;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import pl.terra.common.Arguments;
 import pl.terra.common.exception.SystemException;
-import pl.terra.common.mqtt.Device;
+import pl.terra.common.mqtt.DeviceMqtt;
 import pl.terra.common.mqtt.MqttCore;
 import pl.terra.device.model.MessageType;
 import pl.terra.device.model.MqttSystemMessage;
@@ -21,18 +19,18 @@ public class DeviceMqttDriver extends MqttCore {
         DeviceMqttDriver.logger.info(String.format("'%s' class created!", this.getClass().getName()));
     }
 
-    public void sendToBackend(final Device device, MqttSystemMessage message) throws SystemException {
-        publish(device.getToServiceTopic(), message);
+    public void sendToBackend(final DeviceMqtt deviceMqtt, MqttSystemMessage message) throws SystemException {
+        publish(deviceMqtt.getToServiceTopic(), message);
     }
 
     @Override
-    protected void messageArrived(final Device device, final MqttSystemMessage message) throws SystemException {
+    protected void messageArrived(final DeviceMqtt deviceMqtt, final MqttSystemMessage message) throws SystemException {
         final MqttSystemMessage response = new MqttSystemMessage();
         response.setMessageId(message.getMessageId());
         response.setType(MessageType.OK);
         response.setPayload(null);
 
-        sendToBackend(device, response);
+        sendToBackend(deviceMqtt, response);
     }
 
 }

@@ -6,11 +6,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import pl.terra.cloud_simulator.mqtt.DeviceMqttDriver;
 import pl.terra.common.Arguments;
 import pl.terra.common.exception.MqttTimeoutException;
 import pl.terra.common.exception.SystemException;
-import pl.terra.device.model.MessageType;
 import pl.terra.device.model.MqttSystemMessage;
 
 import java.nio.charset.StandardCharsets;
@@ -26,7 +24,7 @@ public abstract class MqttCore implements MqttCallback {
     public final int qos = 0;
 
     private final MqttClient client;
-    private final List<Device> registeredDevices = new ArrayList<>();
+    private final List<DeviceMqtt> registeredDeviceMqtts = new ArrayList<>();
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final Map<Long, MqttSystemMessage> messageMap = new HashMap<>();
@@ -57,69 +55,69 @@ public abstract class MqttCore implements MqttCallback {
     }
 
 
-    private void checkDevice(final Device device) throws SystemException {
-        Arguments.isNull(device, "device");
-        if (!registeredDevices.contains(device)) {
-            final String message = String.format("can't find device: '%s' in added device list.", device);
+    private void checkDevice(final DeviceMqtt deviceMqtt) throws SystemException {
+        Arguments.isNull(deviceMqtt, "device");
+        if (!registeredDeviceMqtts.contains(deviceMqtt)) {
+            final String message = String.format("can't find device: '%s' in added device list.", deviceMqtt);
             MqttCore.logger.error(message);
             throw new SystemException(message);
         }
     }
 
-    public void registerDevice(final Device device) throws SystemException {
-        Arguments.isNull(device, "device");
+    public void registerDevice(final DeviceMqtt deviceMqtt) throws SystemException {
+        Arguments.isNull(deviceMqtt, "device");
 
         try {
-            client.subscribe(device.getToServiceTopic(), qos);
+            client.subscribe(deviceMqtt.getToServiceTopic(), qos);
         } catch (MqttException e) {
-            final String message = String.format("can't subscribe topic: '%s'.", device.getToServiceTopic());
+            final String message = String.format("can't subscribe topic: '%s'.", deviceMqtt.getToServiceTopic());
             MqttCore.logger.error(message, e);
             throw new SystemException(message);
         }
 
-        registeredDevices.add(device);
+        registeredDeviceMqtts.add(deviceMqtt);
     }
 
-    public void remove(final Device device) throws SystemException {
-        Arguments.isNull(device, "device");
+    public void remove(final DeviceMqtt deviceMqtt) throws SystemException {
+        Arguments.isNull(deviceMqtt, "device");
 
         try {
-            client.unsubscribe(device.getToServiceTopic());
+            client.unsubscribe(deviceMqtt.getToServiceTopic());
         } catch (MqttException e) {
-            final String message = String.format("can't unsubscribe topic: '%s'.", device.getToServiceTopic());
+            final String message = String.format("can't unsubscribe topic: '%s'.", deviceMqtt.getToServiceTopic());
             MqttCore.logger.error(message, e);
             throw new SystemException(message);
         }
 
-        registeredDevices.remove(device);
+        registeredDeviceMqtts.remove(deviceMqtt);
     }
 
-    public void registerService(final Device device) throws SystemException {
-        Arguments.isNull(device, "device");
+    public void registerService(final DeviceMqtt deviceMqtt) throws SystemException {
+        Arguments.isNull(deviceMqtt, "device");
 
         try {
-            client.subscribe(device.getToDeviceTopic(), qos);
+            client.subscribe(deviceMqtt.getToDeviceTopic(), qos);
         } catch (MqttException e) {
-            final String message = String.format("can't subscribe topic: '%s'.", device.getToServiceTopic());
+            final String message = String.format("can't subscribe topic: '%s'.", deviceMqtt.getToServiceTopic());
             MqttCore.logger.error(message, e);
             throw new SystemException(message);
         }
 
-        registeredDevices.add(device);
+        registeredDeviceMqtts.add(deviceMqtt);
     }
 
-    public void removeService(final Device device) throws SystemException {
-        Arguments.isNull(device, "device");
+    public void removeService(final DeviceMqtt deviceMqtt) throws SystemException {
+        Arguments.isNull(deviceMqtt, "device");
 
         try {
-            client.unsubscribe(device.getToDeviceTopic());
+            client.unsubscribe(deviceMqtt.getToDeviceTopic());
         } catch (MqttException e) {
-            final String message = String.format("can't unsubscribe topic: '%s'.", device.getToServiceTopic());
+            final String message = String.format("can't unsubscribe topic: '%s'.", deviceMqtt.getToServiceTopic());
             MqttCore.logger.error(message, e);
             throw new SystemException(message);
         }
 
-        registeredDevices.remove(device);
+        registeredDeviceMqtts.remove(deviceMqtt);
     }
 
     protected void publish(final String topic, final MqttSystemMessage mqttSystemMessage) throws SystemException {
@@ -146,17 +144,17 @@ public abstract class MqttCore implements MqttCallback {
         }
     }
 
-    public MqttSystemMessage exchange(final Device device, final MqttSystemMessage mqttSystemMessage,
+    public MqttSystemMessage exchange(final DeviceMqtt deviceMqtt, final MqttSystemMessage mqttSystemMessage,
                                       final Long timeout) throws SystemException {
-        Arguments.isNull(device, "device");
+        Arguments.isNull(deviceMqtt, "device");
         Arguments.isNull(mqttSystemMessage, "mqttSystemMessage");
         Arguments.isNull(timeout, "timeout");
 
-        checkDevice(device);
+        checkDevice(deviceMqtt);
 
         messageMap.put(mqttSystemMessage.getMessageId(), null);
 
-        publish(device.getToDeviceTopic(), mqttSystemMessage);
+        publish(deviceMqtt.getToDeviceTopic(), mqttSystemMessage);
 
 
         final long start = System.currentTimeMillis();
@@ -201,12 +199,12 @@ public abstract class MqttCore implements MqttCallback {
             return;
         }
 
-        final Device device = registeredDevices.stream()
+        final DeviceMqtt deviceMqtt = registeredDeviceMqtts.stream()
                 .filter(e -> e.getToDeviceTopic().equals(topic))
                 .findFirst()
                 .orElse(null);
 
-        messageArrived(device, message);
+        messageArrived(deviceMqtt, message);
     }
 
     @Override
@@ -214,5 +212,5 @@ public abstract class MqttCore implements MqttCallback {
 
     }
 
-    protected abstract void messageArrived(Device device, MqttSystemMessage message) throws SystemException;
+    protected abstract void messageArrived(DeviceMqtt deviceMqtt, MqttSystemMessage message) throws SystemException;
 }

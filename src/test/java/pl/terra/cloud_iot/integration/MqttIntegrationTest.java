@@ -10,7 +10,7 @@ import pl.terra.cloud_iot.mqtt.ServiceMqttDriver;
 import pl.terra.cloud_simulator.TerraDeviceSimulatorApplication;
 import pl.terra.cloud_simulator.mqtt.DeviceMqttDriver;
 import pl.terra.common.exception.SystemException;
-import pl.terra.common.mqtt.Device;
+import pl.terra.common.mqtt.DeviceMqtt;
 import pl.terra.device.model.MessageType;
 import pl.terra.device.model.MqttSystemMessage;
 
@@ -31,19 +31,19 @@ public class MqttIntegrationTest extends IntegrationTestBase {
 
     @Test
     void testExchangeMechanism() throws SystemException {
-        final Device testDevice = new Device();
-        testDevice.setToDeviceTopic("/to/device");
-        testDevice.setToServiceTopic("/to/service");
+        final DeviceMqtt testDeviceMqtt = new DeviceMqtt();
+        testDeviceMqtt.setToDeviceTopic("/to/device");
+        testDeviceMqtt.setToServiceTopic("/to/service");
 
-        serviceMqttDriver.registerDevice(testDevice);
-        deviceMqttDriver.registerService(testDevice);
+        serviceMqttDriver.registerDevice(testDeviceMqtt);
+        deviceMqttDriver.registerService(testDeviceMqtt);
 
         MqttSystemMessage message = new MqttSystemMessage();
         message.setMessageId(69L);
         message.setType(MessageType.ENV_INFO);
         message.setPayload(null);
 
-        MqttSystemMessage response = serviceMqttDriver.exchange(testDevice, message, 10000L);
+        MqttSystemMessage response = serviceMqttDriver.exchange(testDeviceMqtt, message, 10000L);
 
         Assertions.assertEquals(69L, response.getMessageId());
         Assertions.assertEquals(MessageType.OK, response.getType());

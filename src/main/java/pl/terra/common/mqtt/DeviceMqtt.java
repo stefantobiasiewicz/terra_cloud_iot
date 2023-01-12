@@ -1,6 +1,6 @@
 package pl.terra.common.mqtt;
 
-public class Device {
+public class DeviceMqtt {
 
     private String toDeviceTopic;
     private String toServiceTopic;

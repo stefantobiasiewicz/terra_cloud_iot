@@ -3,7 +3,35 @@ info:
   title: Cloud-iot
   description: Api definition for cloud iot service
   version: 1.0.0
-paths: {}
+paths:
+  /device/add/{userId}/{deviceCode}:
+    post:
+      tags:
+        - onboarding
+      summary: Adding device to service
+      description: Add device to pending list
+      operationId: addDeviceToPoolList
+      parameters:
+        - name: userId
+          in: path
+          description: unique ID of user
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: deviceCode
+          in: path
+          description: unique ID of device
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Successful operation
+        '400':
+          description: Bad parameters
+        '404':
+          description: Device not
 
 components:
   schemas:
