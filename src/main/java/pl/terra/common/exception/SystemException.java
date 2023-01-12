@@ -1,4 +1,4 @@
-package pl.terra.cloud_iot.common.exception;
+package pl.terra.common.exception;
 
 public class SystemException extends Exception{
 

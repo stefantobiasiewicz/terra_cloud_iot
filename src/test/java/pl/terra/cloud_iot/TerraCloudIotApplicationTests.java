@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import pl.terra.cloud_iot.mqtt.MqttCore;
+import pl.terra.common.mqtt.MqttCore;
 import pl.terra.device.model.LightCmd;
 import pl.terra.device.model.MqttSystemMessage;
 

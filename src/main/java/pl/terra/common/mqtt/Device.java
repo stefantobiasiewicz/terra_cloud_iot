@@ -1,4 +1,4 @@
-package pl.terra.cloud_iot.mqtt;
+package pl.terra.common.mqtt;
 
 public class Device {
 

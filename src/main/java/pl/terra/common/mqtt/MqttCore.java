@@ -1,4 +1,4 @@
-package pl.terra.cloud_iot.mqtt;
+package pl.terra.common.mqtt;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,11 +6,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import pl.terra.cloud_iot.common.Arguments;
-import pl.terra.cloud_iot.common.exception.MqttTimeoutException;
-import pl.terra.cloud_iot.common.exception.SystemException;
+import pl.terra.common.Arguments;
+import pl.terra.common.exception.MqttTimeoutException;
+import pl.terra.common.exception.SystemException;
 import pl.terra.device.model.MqttSystemMessage;
 
 import java.nio.charset.StandardCharsets;
@@ -19,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+
 public class MqttCore implements MqttCallback {
     private final static Logger logger = LogManager.getLogger(MqttCore.class);
 
@@ -32,8 +30,7 @@ public class MqttCore implements MqttCallback {
     private final Map<Long, MqttSystemMessage> messageMap = new HashMap<>();
 
 
-    public MqttCore(@Value("${mqtt.broker}") final String brokerUrl, @Value("${mqtt.username}")final String username,
-                    @Value("${mqtt.password}") final String password, @Value("${mqtt.clientId}") final String clientId)
+    public MqttCore(final String brokerUrl, final String username, final String password, final String clientId)
             throws SystemException {
         Arguments.isNullOrEmpty(brokerUrl, "brokerUrl");
         Arguments.isNullOrEmpty(username, "username");
@@ -53,6 +50,8 @@ public class MqttCore implements MqttCallback {
             MqttCore.logger.error(message, e);
             throw new SystemException(message);
         }
+
+        MqttCore.logger.info(String.format("'%s' class created!", this.getClass().getName()));
     }
 
 

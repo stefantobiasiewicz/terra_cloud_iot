@@ -1,6 +1,6 @@
-package pl.terra.cloud_iot.common;
+package pl.terra.common;
 
-import pl.terra.cloud_iot.common.exception.SystemException;
+import pl.terra.common.exception.SystemException;
 
 public final class Arguments {
 
