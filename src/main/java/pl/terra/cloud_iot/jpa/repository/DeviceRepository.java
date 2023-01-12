@@ -13,6 +13,6 @@ import java.util.Optional;
 public interface DeviceRepository extends JpaRepository<DeviceEntity, Long> {
     Optional<DeviceEntity> findByFactoryCode(final String code);
 
-    @Query(value = "Select * form DeviceEntity d where d.toDeviceTopic = :#{#device.toDeviceTopic} and d.toServiceTopic = :#{#device.toServiceTopic}")
-    Optional<DeviceEntity> findByDeviceMqtt(@Param("device") DeviceMqtt deviceMqtt);
+    @Query(value = "Select d from DeviceEntity d where d.toDeviceTopic = :toDeviceTopic and d.toServiceTopic = :toServiceTopic")
+    Optional<DeviceEntity> findByDeviceMqtt(@Param("toDeviceTopic") String toDeviceTopic, @Param("toServiceTopic") String toServiceTopic);
 }

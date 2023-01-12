@@ -16,10 +16,6 @@ import java.io.IOException;
 
 @SpringBootTest
 class TerraCloudIotApplicationTests extends IntegrationTestBase {
-
-    @MockBean
-    MqttCore mqttCore;
-
     @Test
     void contextLoads() {
     }
