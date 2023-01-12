@@ -6,9 +6,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import pl.terra.cloud_simulator.mqtt.DeviceMqttDriver;
 import pl.terra.common.Arguments;
 import pl.terra.common.exception.MqttTimeoutException;
 import pl.terra.common.exception.SystemException;
+import pl.terra.device.model.MessageType;
 import pl.terra.device.model.MqttSystemMessage;
 
 import java.nio.charset.StandardCharsets;
@@ -18,10 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MqttCore implements MqttCallback {
+public abstract class MqttCore implements MqttCallback {
     private final static Logger logger = LogManager.getLogger(MqttCore.class);
 
-    private final int qos = 0;
+    public final int qos = 0;
 
     private final MqttClient client;
     private final List<Device> registeredDevices = new ArrayList<>();
@@ -92,7 +94,35 @@ public class MqttCore implements MqttCallback {
         registeredDevices.remove(device);
     }
 
-    private void publish(final String topic, final MqttSystemMessage mqttSystemMessage) throws SystemException {
+    public void registerService(final Device device) throws SystemException {
+        Arguments.isNull(device, "device");
+
+        try {
+            client.subscribe(device.getToDeviceTopic(), qos);
+        } catch (MqttException e) {
+            final String message = String.format("can't subscribe topic: '%s'.", device.getToServiceTopic());
+            MqttCore.logger.error(message, e);
+            throw new SystemException(message);
+        }
+
+        registeredDevices.add(device);
+    }
+
+    public void removeService(final Device device) throws SystemException {
+        Arguments.isNull(device, "device");
+
+        try {
+            client.unsubscribe(device.getToDeviceTopic());
+        } catch (MqttException e) {
+            final String message = String.format("can't unsubscribe topic: '%s'.", device.getToServiceTopic());
+            MqttCore.logger.error(message, e);
+            throw new SystemException(message);
+        }
+
+        registeredDevices.remove(device);
+    }
+
+    protected void publish(final String topic, final MqttSystemMessage mqttSystemMessage) throws SystemException {
         Arguments.isNull(mqttSystemMessage, "mqttSystemMessage");
         Arguments.isNullOrEmpty(topic, "topic");
 
@@ -170,11 +200,19 @@ public class MqttCore implements MqttCallback {
             messageMap.put(message.getMessageId(), message);
             return;
         }
-        //rest message handling
+
+        final Device device = registeredDevices.stream()
+                .filter(e -> e.getToDeviceTopic().equals(topic))
+                .findFirst()
+                .orElse(null);
+
+        messageArrived(device, message);
     }
 
     @Override
     public void deliveryComplete(final IMqttDeliveryToken iMqttDeliveryToken) {
 
     }
+
+    protected abstract void messageArrived(Device device, MqttSystemMessage message) throws SystemException;
 }
