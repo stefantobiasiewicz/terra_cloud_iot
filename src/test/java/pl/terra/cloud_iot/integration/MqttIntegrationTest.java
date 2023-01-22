@@ -40,7 +40,7 @@ public class MqttIntegrationTest extends IntegrationTestBase {
 
         MqttSystemMessage message = new MqttSystemMessage();
         message.setMessageId(69L);
-        message.setType(MessageType.ENV_INFO);
+        message.setType(MessageType.PING);
         message.setPayload(null);
 
         MqttSystemMessage response = serviceMqttDriver.exchange(testDeviceMqtt, message, 10000L);

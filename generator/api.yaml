@@ -30,15 +30,75 @@ paths:
           description: Successful operation
         '400':
           description: Bad parameters
+  /device/connection/{deviceCode}:
+    get:
+      tags:
+        - onboarding
+      description: Endpoint provide device a topics to connect
+      operationId: getConnection
+      parameters:
+        - name: deviceCode
+          in: path
+          description: unique ID of device
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connection'
+        '400':
+          description: Bad parameters
         '404':
-          description: Device not
-
+          description: Device not found
+  /device/all/{userId}:
+    get:
+      tags:
+        - device
+      description: Endpoint for getting all user devices
+      operationId: getAll
+      parameters:
+        - name: userId
+          in: path
+          description: unique ID of user
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+        '400':
+          description: Bad parameters
+        '404':
+          description: Device not found
 components:
   schemas:
-    Alfanum:
+    Connection:
       type: object
       properties:
-        spec:
-          type: integer
-        next:
+        toDeviceTopic:
           type: string
+        toServiceTopic:
+          type: string
+    Device:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        image:
+          type: string
+          format: uri
+

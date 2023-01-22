@@ -182,6 +182,7 @@ public abstract class MqttCore implements MqttCallback {
     public void messageArrived(final String topic, final MqttMessage mqttMessage) throws Exception {
         Arguments.isNullOrEmpty(topic, "topic");
         Arguments.isNull(mqttMessage, "mqttMessage");
+        MqttCore.logger.debug(String.format("arrived message: '%s' on topic: '%s'", mqttMessage, topic));
 
         MqttSystemMessage message = null;
         try {
@@ -200,9 +201,12 @@ public abstract class MqttCore implements MqttCallback {
         }
 
         final DeviceMqtt deviceMqtt = registeredDeviceMqtts.stream()
-                .filter(e -> e.getToDeviceTopic().equals(topic))
+                .filter(e -> e.getToDeviceTopic().equals(topic) || e.getToServiceTopic().equals(topic))
                 .findFirst()
                 .orElse(null);
+        if(deviceMqtt == null) {
+            throw new SystemException(String.format("can't find device in registered devices for topic: '%s'.", topic));
+        }
 
         messageArrived(deviceMqtt, message);
     }

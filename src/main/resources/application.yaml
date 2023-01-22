@@ -17,7 +17,6 @@ mqtt:
   password: ${MQTT_PASSWORD:master}
   clientId: ${MQTT_CLIENT_ID:iot_service}
 
-logging:
-  level:
-    com:
-      baeldung: TRACE
+simulator:
+  backend:
+    url: "http://localhost:9000"

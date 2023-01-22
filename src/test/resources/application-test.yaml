@@ -1,5 +1,14 @@
+server:
+  port: 60211
+
+
 spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+
+simulator:
+  backend:
+    url: "http://localhost:60211"

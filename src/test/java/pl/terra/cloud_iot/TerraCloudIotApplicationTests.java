@@ -14,8 +14,7 @@ import pl.terra.device.model.MqttSystemMessage;
 import java.io.File;
 import java.io.IOException;
 
-@SpringBootTest
-class TerraCloudIotApplicationTests extends IntegrationTestBase {
+class TerraCloudIotApplicationTests {
     @Test
     void contextLoads() {
     }

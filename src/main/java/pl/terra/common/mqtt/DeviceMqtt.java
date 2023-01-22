@@ -1,7 +1,6 @@
 package pl.terra.common.mqtt;
 
 public class DeviceMqtt {
-
     private String toDeviceTopic;
     private String toServiceTopic;
 
@@ -19,5 +18,13 @@ public class DeviceMqtt {
 
     public void setToServiceTopic(String toServiceTopic) {
         this.toServiceTopic = toServiceTopic;
+    }
+
+    @Override
+    public String toString() {
+        return "DeviceMqtt{" +
+                "toDeviceTopic='" + toDeviceTopic + '\'' +
+                ", toServiceTopic='" + toServiceTopic + '\'' +
+                '}';
     }
 }

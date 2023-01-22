@@ -26,7 +26,7 @@ components:
           $ref: '#/components/schemas/ModelDouble'
     MessageType:
       type: string
-      enum: [ PING, OK, ERROR, ENV_INFO, LIGHT_CMD ]
+      enum: [ PING, OK, ERROR, AUTHORIZE, ENV_INFO, LIGHT_CMD ]
     MqttSystemMessage:
       type: object
       properties:
