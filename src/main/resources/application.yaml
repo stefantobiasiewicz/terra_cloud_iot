@@ -16,7 +16,3 @@ mqtt:
   username: ${MQTT_USER:service}
   password: ${MQTT_PASSWORD:master}
   clientId: ${MQTT_CLIENT_ID:iot_service}
-
-simulator:
-  backend:
-    url: "http://localhost:9000"

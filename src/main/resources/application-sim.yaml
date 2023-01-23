@@ -1,0 +1,12 @@
+server:
+  port: 9060
+
+mqtt:
+  broker: ${MQTT_BROKER:tcp://localhost:1883}
+  username: ${MQTT_USER:service}
+  password: ${MQTT_PASSWORD:master}
+  clientId: ${MQTT_CLIENT_ID:iot_service}
+
+simulator:
+  backend:
+    url: "http://localhost:9000"
