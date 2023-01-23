@@ -10,11 +10,20 @@ public class RandomWithDelay {
         this.factor = factor;
     }
 
+    public RandomWithDelay setStartValue(Double value) {
+        prevGeneration = value;
+        return this;
+    }
+
     public Double getRandom(final Double predict) {
         Random r = new Random();
-        double randomValue =  r.nextDouble();
+        double randomValue =  (double)r.nextInt( 100)/100;
 
-        final Double result = randomValue * factor + prevGeneration;
+        double delta = (predict - prevGeneration) * randomValue;
+
+        double noise = randomValue * 2;
+
+        final Double result = prevGeneration + delta + noise;
         prevGeneration = result;
         return result;
     }

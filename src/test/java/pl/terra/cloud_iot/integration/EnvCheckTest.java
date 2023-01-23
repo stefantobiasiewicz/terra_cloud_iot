@@ -43,6 +43,7 @@ public class EnvCheckTest extends IntegrationTestBase {
             entity.setCreatedAt(LocalDate.now());
             entity.setToDeviceTopic(String.format("device/%s", code));
             entity.setToServiceTopic(String.format("service/%s", code));
+            entity.setName("Name");
 
             deviceRepository.save(entity);
         }

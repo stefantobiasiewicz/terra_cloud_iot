@@ -9,7 +9,7 @@ paths:
       tags:
         - onboarding
       summary: Adding device to service
-      description: Add device to pending list
+      description: Add device to pending list task -> 'Rejestracja urządzenia'
       operationId: addDeviceToPoolList
       parameters:
         - name: userId
@@ -34,7 +34,7 @@ paths:
     get:
       tags:
         - onboarding
-      description: Endpoint provide device a topics to connect
+      description: Endpoint for DEVICE! -> get device a topics to connect
       operationId: getConnection
       parameters:
         - name: deviceCode
@@ -58,7 +58,7 @@ paths:
     get:
       tags:
         - device
-      description: Endpoint for getting all user devices
+      description: Endpoint for getting all user devices  task -> 'Home screen'
       operationId: getAll
       parameters:
         - name: userId
@@ -101,4 +101,10 @@ components:
         image:
           type: string
           format: uri
+        status:
+          description: device during onboarding is in status pending till device connect to backend
+          type: string
+          enum:
+            - PENDING
+            - READY
 

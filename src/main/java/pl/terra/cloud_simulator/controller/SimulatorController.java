@@ -10,9 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import pl.terra.cloud_simulator.mqtt.DeviceMqttDriver;
 import pl.terra.cloud_simulator.rng.RandomWithDelay;
@@ -59,20 +57,24 @@ public class SimulatorController implements SimulatorApi {
             final Map<String, Object> deviceConfig = cache.get(deviceCode);
             final DeviceMqtt deviceMqtt = (DeviceMqtt) deviceConfig.get("device");
 
-            final MqttSystemMessage authorize = new MqttSystemMessage();
-            authorize.setMessageId(0L);
-            authorize.setType(MessageType.ENV_INFO);
-
-            final RandomWithDelay rng = (RandomWithDelay) deviceConfig.get("rng");
+            final MqttSystemMessage message = new MqttSystemMessage();
+            message.setMessageId(0L);
+            message.setType(MessageType.ENV_INFO);
 
 
             final EnvInfo envInfo = new EnvInfo();
-            envInfo.setTemperature(rng.getRandom((Double) deviceConfig.get("temp")));
-            envInfo.setHumidity(rng.getRandom((Double) deviceConfig.get("hum")));
-            envInfo.setPressure(rng.getRandom((Double) deviceConfig.get("pres")));
-            authorize.setPayload(envInfo);
+            final RandomWithDelay tempRng = (RandomWithDelay) deviceConfig.get("temp rng");
+            envInfo.setTemperature(tempRng.getRandom((Double) deviceConfig.get("temp")));
 
-            deviceMqttDrive.sendToBackend(deviceMqtt, authorize);
+            final RandomWithDelay humRng = (RandomWithDelay) deviceConfig.get("hum rng");
+            envInfo.setHumidity(humRng.getRandom((Double) deviceConfig.get("hum")));
+
+            final RandomWithDelay presRng = (RandomWithDelay) deviceConfig.get("pres rng");
+            envInfo.setPressure(presRng.getRandom((Double) deviceConfig.get("pres")));
+
+            message.setPayload(envInfo);
+
+            deviceMqttDrive.sendToBackend(deviceMqtt, message);
         }
     }
 
@@ -84,13 +86,13 @@ public class SimulatorController implements SimulatorApi {
 
     @Override
     @GetMapping("/device/get/code/{id}")
-    public ResponseEntity<String> getDeviceCode(@Parameter(name = "id") final Long id) {
+    public ResponseEntity<String> getDeviceCode(@PathVariable(name = "id") final Long id) {
         return ResponseEntity.ok(devices.get(id));
     }
 
     @Override
     @PostMapping("/device/authorize/{id}")
-    public ResponseEntity<Void> authorizeDevice(@Parameter(name = "id") final Long id) throws SystemException {
+    public ResponseEntity<Void> authorizeDevice(@PathVariable(name = "id") final Long id) throws SystemException {
         final String deviceCode = devices.get(id);
 
         final String url = String.format("%s/device/connection/%s", serverBaseUrl, deviceCode);
@@ -103,10 +105,14 @@ public class SimulatorController implements SimulatorApi {
 
         cache.put(deviceCode, new HashMap<>());
         cache.get(deviceCode).put("device", deviceMqtt);
-        cache.get(deviceCode).put("rng", new RandomWithDelay(0.5));
+
+        cache.get(deviceCode).put("temp rng", new RandomWithDelay(0.3).setStartValue(22.5));
+        cache.get(deviceCode).put("hum rng", new RandomWithDelay(0.5).setStartValue(50.5));
+        cache.get(deviceCode).put("pres rng", new RandomWithDelay(0.9).setStartValue(990.60));
+
         cache.get(deviceCode).put("temp", Double.valueOf(22.5));
         cache.get(deviceCode).put("hum", Double.valueOf(50.5));
-        cache.get(deviceCode).put("press", Double.valueOf(990.60));
+        cache.get(deviceCode).put("pres", Double.valueOf(990.60));
 
         final MqttSystemMessage authorize = new MqttSystemMessage();
         authorize.setMessageId(0L);
