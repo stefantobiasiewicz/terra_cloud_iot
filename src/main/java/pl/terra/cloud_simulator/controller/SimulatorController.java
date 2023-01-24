@@ -2,13 +2,10 @@ package pl.terra.cloud_simulator.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -29,14 +26,16 @@ import java.util.*;
 @RestController
 public class SimulatorController implements SimulatorApi {
 
-    final DeviceMqttDriver deviceMqttDrive;
+    private final ConfigLoader configLoader;
+    private final DeviceMqttDriver deviceMqttDrive;
     private final String serverBaseUrl;
-    RestTemplate restTemplate = new RestTemplate();
+    private RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper mapper = new ObjectMapper();
     private final Map<Long, String> devices = new HashMap<>();
-    private final Map<String, Map<String, Object>> cache = new HashMap<>();
+    private Map<String, Map<String, Object>> cache = new HashMap<>();
 
-    public SimulatorController(DeviceMqttDriver deviceMqttDrive, @Value("${simulator.backend.url}") final String serverPort) throws IOException, URISyntaxException {
+    public SimulatorController(ConfigLoader configLoader, DeviceMqttDriver deviceMqttDrive, @Value("${simulator.backend.url}") final String serverPort) throws IOException, URISyntaxException {
+        this.configLoader = configLoader;
         this.deviceMqttDrive = deviceMqttDrive;
         final File json = new File(SimulatorController.class.getResource("/devices/excample_device_list.json").toURI());
         final List<String> deviceCodes = mapper.readValue(json, new TypeReference<List<String>>() {
@@ -49,11 +48,16 @@ public class SimulatorController implements SimulatorApi {
 
         this.serverBaseUrl = serverPort;
         System.out.println(serverPort);
+
+        Map<String, Map<String, Object>> state = configLoader.readState();
+        if (state != null) {
+            cache = state;
+        }
     }
 
     @Scheduled(fixedDelay = 1000)
     public void scheduleFixedDelayTask() throws SystemException {
-        for (final String deviceCode : cache.keySet()){
+        for (final String deviceCode : cache.keySet()) {
             final Map<String, Object> deviceConfig = cache.get(deviceCode);
             final DeviceMqtt deviceMqtt = (DeviceMqtt) deviceConfig.get("device");
 
@@ -120,6 +124,8 @@ public class SimulatorController implements SimulatorApi {
         authorize.setPayload(null);
 
         deviceMqttDrive.sendToBackend(deviceMqtt, authorize);
+
+        configLoader.saveState(cache);
         return null;
     }
 }

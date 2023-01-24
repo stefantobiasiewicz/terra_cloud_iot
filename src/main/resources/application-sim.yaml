@@ -10,3 +10,5 @@ mqtt:
 simulator:
   backend:
     url: "http://localhost:9000"
+
+state-file: ./src/main/resources/sim

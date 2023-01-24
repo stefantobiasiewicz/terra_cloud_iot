@@ -1,8 +1,11 @@
 package pl.terra.cloud_simulator.rng;
 
+import java.io.Serializable;
 import java.util.Random;
 
-public class RandomWithDelay {
+public class RandomWithDelay implements Serializable {
+    private static final long serialVersionUID = 1231231231L;
+
     private Double prevGeneration = 0.;
     private Double factor = 0.5;
 

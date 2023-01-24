@@ -1,6 +1,8 @@
 package pl.terra.common.mqtt;
 
-public class DeviceMqtt {
+import java.io.Serializable;
+
+public class DeviceMqtt implements Serializable {
     private String toDeviceTopic;
     private String toServiceTopic;
 
