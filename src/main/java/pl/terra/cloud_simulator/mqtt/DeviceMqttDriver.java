@@ -29,8 +29,8 @@ public class DeviceMqttDriver extends MqttCore {
         response.setMessageId(message.getMessageId());
         response.setType(MessageType.OK);
         response.setPayload(null);
-
         sendToBackend(deviceMqtt, response);
+
     }
 
 }

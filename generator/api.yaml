@@ -81,6 +81,40 @@ paths:
           description: Bad parameters
         '404':
           description: Device not found
+  /device/{userId}/{deviceId}:
+    get:
+      tags:
+        - device
+      description: Endpoint for getting info of device task -> 'Status urządzenia'
+      operationId: get
+      parameters:
+        - name: userId
+          in: path
+          description: unique ID of user
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: deviceId
+          in: path
+          description: unique ID of Device
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceStatus'
+        '400':
+          description: Bad parameters
+        '404':
+          description: Device not found
 components:
   schemas:
     Connection:
@@ -107,4 +141,9 @@ components:
           enum:
             - PENDING
             - READY
+    DeviceStatus:
+      type: object
+      properties:
+        device:
+          $ref: '#/components/schemas/Device'
 

@@ -24,9 +24,30 @@ components:
           $ref: '#/components/schemas/ModelDouble'
         pressure:
           $ref: '#/components/schemas/ModelDouble'
+    StatusResp:
+      type: object
+      properties:
+        envInfo:
+          $ref: '#/components/schemas/EnvInfo'
+        light:
+          type: boolean
+        doors:
+          type: boolean
+        heater:
+          type: object
+          properties:
+            onOff:
+              type: boolean
+            setTemp:
+              type: number
+              format: double
+        fan:
+          type: boolean
+        humidifier:
+          type: boolean
     MessageType:
       type: string
-      enum: [ PING, OK, ERROR, AUTHORIZE, ENV_INFO, LIGHT_CMD ]
+      enum: [ PING, OK, ERROR, AUTHORIZE, ENV_INFO, LIGHT_CMD, STATUS_REQ, STATUS_RESP ]
     MqttSystemMessage:
       type: object
       properties:
