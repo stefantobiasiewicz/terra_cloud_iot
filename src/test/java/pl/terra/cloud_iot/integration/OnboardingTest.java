@@ -48,7 +48,7 @@ public class OnboardingTest extends IntegrationTestBase{
     @Test
     void testManualOnboarding() throws Exception {
         final Long userId = 5L;
-        final String deviceCode = "SLZ81FQIOW";
+        final String deviceCode = "X0YWQ8AANY";
 
         // user call
         onboardingApi.addDeviceToPoolList(userId, deviceCode);
@@ -84,7 +84,7 @@ public class OnboardingTest extends IntegrationTestBase{
 
     @Test
     void testAutomaticOnboarding() throws Exception {
-        final Long userId = 15L;
+        final Long userId = 16L;
         final String deviceCode = simulatorApi.getDeviceCode(userId).getBody();
 
         // suer call

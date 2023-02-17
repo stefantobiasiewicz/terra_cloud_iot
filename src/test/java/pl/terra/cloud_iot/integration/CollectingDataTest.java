@@ -22,7 +22,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(classes = {TerraCloudIotApplication.class, TerraDeviceSimulatorApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class CollectingTest extends IntegrationTestBase{
+public class CollectingDataTest extends IntegrationTestBase{
     @Autowired
     SimulatorApi simulatorApi;
     @Autowired
@@ -35,7 +35,7 @@ public class CollectingTest extends IntegrationTestBase{
 
     @BeforeAll
     void prepareDevices() throws Exception {
-        final Long userId = 15L;
+        final Long userId = 1L;
         final String deviceCode = simulatorApi.getDeviceCode(userId).getBody();
 
         // suer call
