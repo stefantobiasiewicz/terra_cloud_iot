@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pl.terra.cloud_simulator.mqtt.DeviceMqttDriver;
 import pl.terra.cloud_simulator.rng.RandomWithDelay;
@@ -104,12 +106,22 @@ public class SimulatorController implements SimulatorApi {
 
     @Override
     @PostMapping("/device/authorize/{id}")
-    public ResponseEntity<Void> authorizeDevice(@PathVariable(name = "id") final Long id) throws SystemException {
+    public ResponseEntity<String> authorizeDevice(@PathVariable(name = "id") final Long id) throws SystemException {
         final String deviceCode = devices.get(id);
 
         final String url = String.format("%s/device/connection/%s", serverBaseUrl, deviceCode);
-        final Connection connection = restTemplate.exchange(url, HttpMethod.GET,
-                new HttpEntity<>(null), Connection.class).getBody();
+
+        Connection connection;
+        try {
+            connection = restTemplate.exchange(url, HttpMethod.GET,
+                    new HttpEntity<>(null), Connection.class).getBody();
+        } catch (HttpClientErrorException e) {
+            if(e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return ResponseEntity.status(404).body("can't find device on backend");
+            }
+            return ResponseEntity.status(500).body("error calling backend");
+        }
+
 
         final DeviceMqtt deviceMqtt = new DeviceMqtt();
         deviceMqtt.setToDeviceTopic(connection.getToDeviceTopic());

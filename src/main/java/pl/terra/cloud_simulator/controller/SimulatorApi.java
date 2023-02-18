@@ -10,5 +10,5 @@ public interface SimulatorApi {
 
     ResponseEntity<String> getDeviceCode(Long id);
 
-    ResponseEntity<Void> authorizeDevice(Long id) throws SystemException;
+    ResponseEntity<String> authorizeDevice(Long id) throws SystemException;
 }
