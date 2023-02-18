@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
+import pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus;
 import pl.terra.cloud_iot.jpa.repository.DeviceRepository;
 import pl.terra.common.exception.SystemException;
 import pl.terra.common.mqtt.DeviceMqtt;

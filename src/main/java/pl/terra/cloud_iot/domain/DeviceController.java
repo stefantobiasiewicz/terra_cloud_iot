@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
+import pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus;
 import pl.terra.cloud_iot.mqtt.MqttDispatcher;
 import pl.terra.cloud_iot.mqtt.ServiceMqttDriver;
 import pl.terra.common.exception.SystemException;
@@ -24,6 +25,15 @@ public class DeviceController implements MqttDispatcher {
     @Override
     public void handleMessage(DeviceEntity device, MqttSystemMessage message) throws SystemException {
         DeviceController.logger.debug(String.format("get message for device: '%s' and message: '%s'", device, message));
+        if(device.getStatus() != DeviceStatus.READY) {
+            switch (message.getType()) {
+                case AUTHORIZE:
+                    onboardingService.setStatusReady(device);
+                    return;
+                default:
+                    return;
+            }
+        }
         switch (message.getType()) {
             case AUTHORIZE:
                 onboardingService.setStatusReady(device);

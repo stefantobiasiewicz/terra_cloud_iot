@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
 import pl.terra.common.mqtt.DeviceMqtt;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,4 +16,6 @@ public interface DeviceRepository extends JpaRepository<DeviceEntity, Long> {
 
     @Query(value = "Select d from DeviceEntity d where d.toDeviceTopic = :toDeviceTopic and d.toServiceTopic = :toServiceTopic")
     Optional<DeviceEntity> findByDeviceMqtt(@Param("toDeviceTopic") String toDeviceTopic, @Param("toServiceTopic") String toServiceTopic);
+
+    List<DeviceEntity> findAllByUserId(Long userId);
 }

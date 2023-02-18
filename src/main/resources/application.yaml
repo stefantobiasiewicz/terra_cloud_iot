@@ -11,6 +11,10 @@ spring:
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
 
+logging:
+  level:
+    pl.terra: DEBUG
+
 mqtt:
   broker: ${MQTT_BROKER:tcp://localhost:1883}
   username: ${MQTT_USER:service}
