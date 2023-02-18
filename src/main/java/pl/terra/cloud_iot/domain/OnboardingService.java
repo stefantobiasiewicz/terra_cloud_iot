@@ -4,6 +4,7 @@ package pl.terra.cloud_iot.domain;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
+import pl.terra.cloud_iot.exceptions.AlreadyExistException;
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
 import pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus;
 import pl.terra.cloud_iot.jpa.repository.DeviceRepository;
@@ -38,6 +39,10 @@ public class OnboardingService {
     public void addToPool(final Long userId, final String deviceCode) throws SystemException {
         OnboardingService.logger.debug(String.format("Adding device to pool list with userId: %d and device code: '%s'", userId, deviceCode));
 
+        if (deviceRepository.findByFactoryCode(deviceCode).isPresent()) {
+            throw new AlreadyExistException(String.format("device with code: '%s' already exist", deviceCode));
+        }
+
         final DeviceEntity entity = new DeviceEntity();
         entity.setUserId(userId);
         entity.setFactoryCode(deviceCode);
@@ -58,7 +63,7 @@ public class OnboardingService {
         OnboardingService.logger.debug(String.format("getting device connection for device code: '%s'", deviceCode));
 
         final DeviceEntity device = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
-        if(device == null) {
+        if (device == null) {
             throw new NotFoundException(String.format("can't find device with device code: %s", deviceCode));
         }
 

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import pl.terra.cloud_iot.exceptions.AlreadyExistException;
 import pl.terra.common.exception.NotFoundException;
 
 @ControllerAdvice
@@ -18,6 +19,13 @@ public class ControllerAdvisor {
         ControllerAdvisor.logger.error(String.format("caught NOT_FOUND exception: '%s'", ex.getMessage()));
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AlreadyExistException.class)
+    ResponseEntity<String> handleAlreadyExistException(Exception ex, WebRequest request) {
+        ControllerAdvisor.logger.error(String.format("caught AlreadyExistException exception: '%s'", ex.getMessage()));
+
+        return new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
     }
 
 }

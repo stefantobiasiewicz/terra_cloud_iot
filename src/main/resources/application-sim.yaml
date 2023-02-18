@@ -12,4 +12,4 @@ simulator:
     url: ${IOT_BACKEND:http://localhost:9000}
 
 state-file: ${STATE_FILE:./src/main/resources/sim}
-example-devices: ${EXAMPLE_DEVICES:./src/main/resources/sim}
+example-devices: ${EXAMPLE_DEVICES:./src/main/resources/devices/excample_device_list.json}

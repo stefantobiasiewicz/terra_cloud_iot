@@ -54,6 +54,8 @@ paths:
           description: Bad parameters
         '404':
           description: Device not found
+        '409':
+          description: Device already added
   /device/all/{userId}:
     get:
       tags:
