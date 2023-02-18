@@ -9,6 +9,7 @@ mqtt:
 
 simulator:
   backend:
-    url: "http://localhost:9000"
+    url: ${IOT_BACKEND:http://localhost:9000}
 
-state-file: ./src/main/resources/sim
+state-file: ${STATE_FILE:./src/main/resources/sim}
+example-devices: ${EXAMPLE_DEVICES:./src/main/resources/sim}

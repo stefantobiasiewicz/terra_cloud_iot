@@ -24,6 +24,7 @@ import pl.terra.http.model.Connection;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,10 +41,11 @@ public class SimulatorController implements SimulatorApi {
     private final Map<Long, String> devices = new HashMap<>();
     private Map<String, Map<String, Object>> cache = new HashMap<>();
 
-    public SimulatorController(ConfigLoader configLoader, DeviceMqttDriver deviceMqttDrive, @Value("${simulator.backend.url}") final String serverPort) throws IOException, URISyntaxException {
+    public SimulatorController(ConfigLoader configLoader, DeviceMqttDriver deviceMqttDrive, @Value("${simulator.backend.url}") final String serverPort, @Value("${example-devices}") final String pathToExamples) throws IOException, URISyntaxException {
         this.configLoader = configLoader;
         this.deviceMqttDrive = deviceMqttDrive;
-        final File json = new File(SimulatorController.class.getResource("/devices/excample_device_list.json").toURI());
+        System.out.println("example devices file: " + pathToExamples);
+        final File json = new File(pathToExamples);
         final List<String> deviceCodes = mapper.readValue(json, new TypeReference<List<String>>() {
         });
 

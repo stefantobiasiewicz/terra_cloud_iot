@@ -16,6 +16,7 @@ public class ConfigLoader {
     private final File state;
 
     public ConfigLoader(@Value("${state-file:./}") final String stateFileDir) throws URISyntaxException, IOException {
+        System.out.println("config loader path: " + stateFileDir);
         final File parentDirectory = new File(stateFileDir);
         state = new File(parentDirectory, "config.dat");
         state.getAbsolutePath();

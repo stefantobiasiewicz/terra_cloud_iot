@@ -7,9 +7,9 @@ spring:
       ddl-auto: create-drop
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url:  ${POSGTRES_URL:jdbc:postgresql://localhost:5432/cloud_iot}
-    username: ${POSGTRES_USER:postgres}
-    password: ${POSGTRES_PASSWORD:postgres}
+    url:  ${POSTGRES_URL:jdbc:postgresql://localhost:5432/cloud_iot}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
 
 mqtt:
   broker: ${MQTT_BROKER:tcp://localhost:1883}

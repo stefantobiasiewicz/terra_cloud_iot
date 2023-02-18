@@ -1,4 +1,6 @@
 FROM amazoncorretto:18
 EXPOSE 9060
+RUN mkdir -p /application/resource
+ADD src/main/resources/devices/excample_device_list.json /application/resource/excample_device_list.json
 ADD /target/cloud_iot-0.0.1.jar demo.jar
 ENTRYPOINT ["java","-jar","demo.jar"]
