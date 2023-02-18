@@ -4,9 +4,10 @@ import org.springframework.http.ResponseEntity;
 import pl.terra.common.exception.SystemException;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SimulatorApi {
-    ResponseEntity<List<Long>> getAllDeviceIds();
+    ResponseEntity<List<Map.Entry<Long, String>>> getAllDeviceIds();
 
     ResponseEntity<String> getDeviceCode(Long id);
 

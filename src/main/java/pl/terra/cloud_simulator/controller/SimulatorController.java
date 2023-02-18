@@ -26,7 +26,6 @@ import pl.terra.http.model.Connection;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -94,8 +93,9 @@ public class SimulatorController implements SimulatorApi {
 
 
     @Override
-    public ResponseEntity<List<Long>> getAllDeviceIds() {
-        return ResponseEntity.ok(new ArrayList<>(devices.keySet()));
+    @GetMapping("/device/get/all")
+    public ResponseEntity<List<Map.Entry<Long, String>>> getAllDeviceIds() {
+        return ResponseEntity.ok(new ArrayList<>(devices.entrySet()));
     }
 
     @Override
