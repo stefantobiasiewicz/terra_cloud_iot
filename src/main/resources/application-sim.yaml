@@ -1,6 +1,10 @@
 server:
   port: 9060
 
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
 mqtt:
   broker: ${MQTT_BROKER:tcp://localhost:1883}
   username: ${MQTT_USER:service}
