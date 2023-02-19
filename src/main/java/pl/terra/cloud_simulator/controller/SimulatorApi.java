@@ -1,13 +1,14 @@
 package pl.terra.cloud_simulator.controller;
 
 import org.springframework.http.ResponseEntity;
+import pl.terra.cloud_simulator.dto.DevicePair;
 import pl.terra.common.exception.SystemException;
 
 import java.util.List;
 import java.util.Map;
 
 public interface SimulatorApi {
-    ResponseEntity<List<Map.Entry<Long, String>>> getAllDeviceIds();
+    ResponseEntity<List<DevicePair>> getAllDeviceIds();
 
     ResponseEntity<String> getDeviceCode(Long id);
 

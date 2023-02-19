@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import pl.terra.cloud_simulator.dto.DevicePair;
 import pl.terra.cloud_simulator.model.DeviceModel;
 import pl.terra.cloud_simulator.mqtt.DeviceMqttDriver;
 import pl.terra.cloud_simulator.mqtt.MqttDispatcher;
@@ -104,8 +105,14 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
 
     @Override
     @GetMapping("/device/get/all")
-    public ResponseEntity<List<Map.Entry<Long, String>>> getAllDeviceIds() {
-        return ResponseEntity.ok(new ArrayList<>(devicesHardCoded.entrySet()));
+    public ResponseEntity<List<DevicePair>> getAllDeviceIds() {
+        List<DevicePair> devicePairs = new ArrayList<>();
+
+        devicesHardCoded.forEach((aLong, s) -> {
+            devicePairs.add(new DevicePair(aLong, s));
+        });
+
+        return ResponseEntity.ok(devicePairs);
     }
 
     @Override
