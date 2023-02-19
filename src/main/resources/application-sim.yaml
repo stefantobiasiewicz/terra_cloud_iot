@@ -1,5 +1,10 @@
 server:
   port: 9060
+  ssl:
+    key-store: keystore.p12
+    key-store-password: springboot
+    keyStoreType: PKCS12
+    keyAlias: tomcat
 
 spring:
   autoconfigure:
@@ -17,7 +22,7 @@ mqtt:
 
 simulator:
   backend:
-    url: ${IOT_BACKEND:http://localhost:9000}
+    url: ${IOT_BACKEND:https://localhost:9000}
 
 logging:
   level:

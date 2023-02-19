@@ -36,15 +36,16 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
     private final ConfigLoader configLoader;
     private final DeviceMqttDriver deviceMqttDrive;
     private final String serverBaseUrl;
-    private RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private final ObjectMapper mapper = new ObjectMapper();
     private final Map<Long, String> devicesHardCoded = new HashMap<>();
 
     private Map<String, DeviceModel> cacheV2 = new HashMap<>();
 
-    public SimulatorController(ConfigLoader configLoader, DeviceMqttDriver deviceMqttDrive, @Value("${simulator.backend.url}") final String serverPort, @Value("${example-devices}") final String pathToExamples) throws IOException, URISyntaxException, SystemException {
+    public SimulatorController(ConfigLoader configLoader, DeviceMqttDriver deviceMqttDrive, @Value("${simulator.backend.url}") final String serverPort, @Value("${example-devices}") final String pathToExamples, RestTemplate restTemplate) throws IOException, URISyntaxException, SystemException {
         this.configLoader = configLoader;
         this.deviceMqttDrive = deviceMqttDrive;
+        this.restTemplate = restTemplate;
         System.out.println("example devices file: " + pathToExamples);
         final File json = new File(pathToExamples);
         final List<String> deviceCodes = mapper.readValue(json, new TypeReference<List<String>>() {
