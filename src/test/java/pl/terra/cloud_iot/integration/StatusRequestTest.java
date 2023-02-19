@@ -71,6 +71,13 @@ public class StatusRequestTest extends IntegrationTestBase {
 
         Assertions.assertNotNull(status);
         Assertions.assertEquals(deviceId, status.getDevice().getId());
+
+        ResponseEntity<pl.terra.http.model.DeviceStatus> statusResponse2 = deviceApi.get(userId, deviceId);
+
+        pl.terra.http.model.DeviceStatus status2 = statusResponse2.getBody();
+
+        Assertions.assertNotNull(status2);
+        Assertions.assertEquals(deviceId, status2.getDevice().getId());
     }
 
 }

@@ -15,6 +15,7 @@ import pl.terra.common.mqtt.DeviceMqtt;
 import pl.terra.http.model.Connection;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class OnboardingService {
@@ -23,9 +24,19 @@ public class OnboardingService {
     private final ServiceMqttDriver serviceMqttDriver;
     private final DeviceRepository deviceRepository;
 
-    public OnboardingService(ServiceMqttDriver serviceMqttDriver, DeviceRepository deviceRepository) {
+    public OnboardingService(ServiceMqttDriver serviceMqttDriver, DeviceRepository deviceRepository) throws SystemException {
         this.serviceMqttDriver = serviceMqttDriver;
         this.deviceRepository = deviceRepository;
+
+        final List<DeviceEntity> deviceEntityList = deviceRepository.findAll();
+
+        for(final DeviceEntity entity : deviceEntityList) {
+            final DeviceMqtt deviceMqtt = new DeviceMqtt();
+            deviceMqtt.setToServiceTopic(entity.getToServiceTopic());
+            deviceMqtt.setToDeviceTopic(entity.getToDeviceTopic());
+            deviceMqtt.setId(entity.getId());
+            serviceMqttDriver.registerDevice(deviceMqtt);
+        }
     }
 
     private String getToDeviceTopic(final String deviceCode) {
