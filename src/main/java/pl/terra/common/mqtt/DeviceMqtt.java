@@ -1,5 +1,7 @@
 package pl.terra.common.mqtt;
 
+import pl.terra.cloud_simulator.model.DeviceModel;
+
 import java.io.Serializable;
 
 public class DeviceMqtt implements Serializable {
@@ -7,6 +9,7 @@ public class DeviceMqtt implements Serializable {
     private String toDeviceTopic;
     private String toServiceTopic;
 
+    public DeviceMqtt() {}
     public Long getId() {
         return id;
     }

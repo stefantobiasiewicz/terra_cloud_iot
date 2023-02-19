@@ -20,6 +20,9 @@ public class DeviceModel implements Serializable {
     private double humidity;
     private boolean humidifierOnOff;
 
+    public DeviceModel() {
+        deviceCode = "should not be ever used";
+    }
 
     public DeviceModel(final String deviceCode) {
         this.deviceCode = deviceCode;

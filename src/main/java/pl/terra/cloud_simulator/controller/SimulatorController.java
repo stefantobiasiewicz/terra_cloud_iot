@@ -132,7 +132,8 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
     public ResponseEntity<DeviceModel> setDeviceStatus(@RequestBody final DeviceModel model) {
         final DeviceModel response = cacheV2.get(model.getDeviceCode());
         if (response != null) {
-            return ResponseEntity.ok(cacheV2.put(model.getDeviceCode(), model));
+            cacheV2.put(model.getDeviceCode(), model);
+            return ResponseEntity.ok(cacheV2.get(model.getDeviceCode()));
         }
         return ResponseEntity.notFound().build();
     }
