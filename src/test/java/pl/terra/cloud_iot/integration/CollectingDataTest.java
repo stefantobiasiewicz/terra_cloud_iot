@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import pl.terra.cloud_iot.TerraCloudIotApplication;
@@ -15,7 +14,6 @@ import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
 import pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus;
 import pl.terra.cloud_iot.jpa.repository.DeviceRepository;
 import pl.terra.cloud_simulator.TerraDeviceSimulatorApplication;
-import pl.terra.cloud_simulator.controller.SimWebConfiguration;
 import pl.terra.cloud_simulator.controller.SimulatorApi;
 import pl.terra.http.api.OnboardingApi;
 

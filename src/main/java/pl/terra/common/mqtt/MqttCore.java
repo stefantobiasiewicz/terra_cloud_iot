@@ -24,7 +24,7 @@ public abstract class MqttCore implements MqttCallback {
 
     public final int qos = 0;
 
-    private final MqttClient client;
+    private final MqttAsyncClient client;
     private final List<DeviceMqtt> registeredDeviceMqtts = new ArrayList<>();
 
     private final ObjectMapper mapper = new ObjectMapper();
@@ -39,12 +39,13 @@ public abstract class MqttCore implements MqttCallback {
         Arguments.isNullOrEmpty(clientId, "clientId");
 
         try {
-            client = new MqttClient(brokerUrl, clientId, new MemoryPersistence());
+            client = new MqttAsyncClient(brokerUrl, clientId, new MemoryPersistence());
             MqttConnectOptions options = new MqttConnectOptions();
             options.setUserName(username);
             options.setPassword(password.toCharArray());
             options.setAutomaticReconnect(true);
-            client.connect(options);
+            IMqttToken token = client.connect(options);
+            token.waitForCompletion();
             client.setCallback(this);
         } catch (final MqttException e) {
             final String message = "can't create mqtt connection.";
@@ -214,7 +215,11 @@ public abstract class MqttCore implements MqttCallback {
 
     @Override
     public void deliveryComplete(final IMqttDeliveryToken iMqttDeliveryToken) {
-
+        try {
+            iMqttDeliveryToken.getMessage();
+        } catch (MqttException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected abstract void messageArrived(DeviceMqtt deviceMqtt, MqttSystemMessage message) throws SystemException;

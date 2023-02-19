@@ -30,7 +30,7 @@ public class OnboardingService {
 
         final List<DeviceEntity> deviceEntityList = deviceRepository.findAll();
 
-        for(final DeviceEntity entity : deviceEntityList) {
+        for (final DeviceEntity entity : deviceEntityList) {
             final DeviceMqtt deviceMqtt = new DeviceMqtt();
             deviceMqtt.setToServiceTopic(entity.getToServiceTopic());
             deviceMqtt.setToDeviceTopic(entity.getToDeviceTopic());

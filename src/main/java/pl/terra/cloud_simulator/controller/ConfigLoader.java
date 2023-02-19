@@ -2,6 +2,7 @@ package pl.terra.cloud_simulator.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import pl.terra.cloud_simulator.model.DeviceModel;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -23,10 +24,10 @@ public class ConfigLoader {
         }
     }
 
-    public Map<String, Map<String, Object>> readState() {
+    public Map<String, DeviceModel> readState() {
         try (final FileInputStream fis = new FileInputStream(state);
              final ObjectInputStream is = new ObjectInputStream(fis)) {
-            return (Map<String, Map<String, Object>>) is.readObject();
+            return (Map<String, DeviceModel>) is.readObject();
         } catch (FileNotFoundException e) {
             return null;
         } catch (IOException e) {
@@ -36,7 +37,7 @@ public class ConfigLoader {
         }
     }
 
-    public void saveState(final Map<String, Map<String, Object>> data) {
+    public void saveState(final Map<String, DeviceModel> data) {
         try (final FileOutputStream fos = new FileOutputStream(state);
              final ObjectOutputStream os = new ObjectOutputStream(fos)) {
             os.writeObject(data);

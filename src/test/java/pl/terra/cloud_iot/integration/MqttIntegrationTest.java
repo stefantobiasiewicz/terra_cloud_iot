@@ -30,7 +30,7 @@ public class MqttIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    void testExchangeMechanism() throws SystemException {
+    void testExchangeMechanism() throws SystemException, InterruptedException {
         final DeviceMqtt testDeviceMqtt = new DeviceMqtt();
         testDeviceMqtt.setToDeviceTopic("/to/device");
         testDeviceMqtt.setToServiceTopic("/to/service");
@@ -47,6 +47,13 @@ public class MqttIntegrationTest extends IntegrationTestBase {
 
         Assertions.assertEquals(69L, response.getMessageId());
         Assertions.assertEquals(MessageType.OK, response.getType());
+
+        Thread.sleep(2000);
+
+        MqttSystemMessage response2 = serviceMqttDriver.exchange(testDeviceMqtt, message, 10000L);
+
+        Assertions.assertEquals(69L, response2.getMessageId());
+        Assertions.assertEquals(MessageType.OK, response2.getType());
     }
 
 }

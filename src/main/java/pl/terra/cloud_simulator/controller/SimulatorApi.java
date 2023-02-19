@@ -5,7 +5,6 @@ import pl.terra.cloud_simulator.dto.DevicePair;
 import pl.terra.common.exception.SystemException;
 
 import java.util.List;
-import java.util.Map;
 
 public interface SimulatorApi {
     ResponseEntity<List<DevicePair>> getAllDeviceIds();

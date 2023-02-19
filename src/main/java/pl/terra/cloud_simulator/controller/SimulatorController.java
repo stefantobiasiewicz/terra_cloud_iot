@@ -20,7 +20,6 @@ import pl.terra.cloud_simulator.dto.DevicePair;
 import pl.terra.cloud_simulator.model.DeviceModel;
 import pl.terra.cloud_simulator.mqtt.DeviceMqttDriver;
 import pl.terra.cloud_simulator.mqtt.MqttDispatcher;
-import pl.terra.cloud_simulator.rng.RandomWithDelay;
 import pl.terra.common.exception.SystemException;
 import pl.terra.common.mqtt.DeviceMqtt;
 import pl.terra.device.model.EnvInfo;
@@ -32,10 +31,7 @@ import pl.terra.http.model.Connection;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class SimulatorController implements SimulatorApi, MqttDispatcher {
@@ -46,11 +42,10 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
     private RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper mapper = new ObjectMapper();
     private final Map<Long, String> devicesHardCoded = new HashMap<>();
-    private Map<String, Map<String, Object>> cache = new HashMap<>();
 
     private Map<String, DeviceModel> cacheV2 = new HashMap<>();
 
-    public SimulatorController(ConfigLoader configLoader, DeviceMqttDriver deviceMqttDrive, @Value("${simulator.backend.url}") final String serverPort, @Value("${example-devices}") final String pathToExamples) throws IOException, URISyntaxException {
+    public SimulatorController(ConfigLoader configLoader, DeviceMqttDriver deviceMqttDrive, @Value("${simulator.backend.url}") final String serverPort, @Value("${example-devices}") final String pathToExamples) throws IOException, URISyntaxException, SystemException {
         this.configLoader = configLoader;
         this.deviceMqttDrive = deviceMqttDrive;
         System.out.println("example devices file: " + pathToExamples);
@@ -66,10 +61,13 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
         this.serverBaseUrl = serverPort;
         System.out.println(serverPort);
 
-        Map<String, Map<String, Object>> state = configLoader.readState();
+        Map<String, DeviceModel> state = configLoader.readState();
         if (state != null) {
-            cache = state;
-            // todo tutja dodac subskrybowanie topikow po odpaleniu
+            cacheV2 = state;
+
+            for (final String deviceCode : cacheV2.keySet()) {
+                deviceMqttDrive.registerService(cacheV2.get(deviceCode).getDeviceMqtt());
+            }
         }
 
         deviceMqttDrive.addDispatcher(this);
@@ -77,9 +75,9 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
 
     @Scheduled(fixedDelay = 1000)
     public void scheduleFixedDelayTask() throws SystemException {
-        for (final String deviceCode : cache.keySet()) {
-            final Map<String, Object> deviceConfig = cache.get(deviceCode);
-            final DeviceMqtt deviceMqtt = (DeviceMqtt) deviceConfig.get("device");
+        for (final String deviceCode : cacheV2.keySet()) {
+            final DeviceModel deviceConfig = cacheV2.get(deviceCode);
+            final DeviceMqtt deviceMqtt = deviceConfig.getDeviceMqtt();
 
             final MqttSystemMessage message = new MqttSystemMessage();
             message.setMessageId(0L);
@@ -87,14 +85,11 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
 
 
             final EnvInfo envInfo = new EnvInfo();
-            final RandomWithDelay tempRng = (RandomWithDelay) deviceConfig.get("temp rng");
-            envInfo.setTemperature(tempRng.getRandom((Double) deviceConfig.get("temp")));
+            envInfo.setTemperature(deviceConfig.getTemperature());
 
-            final RandomWithDelay humRng = (RandomWithDelay) deviceConfig.get("hum rng");
-            envInfo.setHumidity(humRng.getRandom((Double) deviceConfig.get("hum")));
+            envInfo.setHumidity(deviceConfig.getHumidity());
 
-            final RandomWithDelay presRng = (RandomWithDelay) deviceConfig.get("pres rng");
-            envInfo.setPressure(presRng.getRandom((Double) deviceConfig.get("pres")));
+            envInfo.setPressure(deviceConfig.getPressure());
 
             message.setPayload(envInfo);
 
@@ -153,17 +148,6 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
         model.setDeviceMqtt(deviceMqtt);
         cacheV2.put(deviceCode, model);
 
-        cache.put(deviceCode, new HashMap<>());
-        cache.get(deviceCode).put("device", deviceMqtt);
-
-        cache.get(deviceCode).put("temp rng", new RandomWithDelay(0.3).setStartValue(22.5));
-        cache.get(deviceCode).put("hum rng", new RandomWithDelay(0.5).setStartValue(50.5));
-        cache.get(deviceCode).put("pres rng", new RandomWithDelay(0.9).setStartValue(990.60));
-
-        cache.get(deviceCode).put("temp", Double.valueOf(22.5));
-        cache.get(deviceCode).put("hum", Double.valueOf(50.5));
-        cache.get(deviceCode).put("pres", Double.valueOf(990.60));
-
         final MqttSystemMessage authorize = new MqttSystemMessage();
         authorize.setMessageId(0L);
         authorize.setType(MessageType.AUTHORIZE);
@@ -172,15 +156,16 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
         deviceMqttDrive.registerService(deviceMqtt);
         deviceMqttDrive.sendToBackend(deviceMqtt, authorize);
 
-        configLoader.saveState(cache);
+        configLoader.saveState(cacheV2);
         return null;
     }
 
     private DeviceModel getDeviceProperties(final DeviceMqtt deviceMqtt) {
-        final String code = cacheV2.keySet().stream().filter(s -> cacheV2.get(s).getDeviceMqtt().equals(deviceMqtt))
+        final String code = cacheV2.keySet().stream()
+                .filter(s -> Objects.equals(cacheV2.get(s).getDeviceMqtt().getId(), deviceMqtt.getId()))
                 .findFirst().orElse(null);
         if (code == null) {
-            SimulatorController.logger.error("can't find device: '{}' in cache: {}", deviceMqtt, cache);
+            SimulatorController.logger.error("can't find device: '{}' in cache: {}", deviceMqtt, cacheV2);
             return null;
         }
         return cacheV2.get(code);

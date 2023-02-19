@@ -10,7 +10,7 @@ public class DevicePair {
     public DevicePair(final Long id, final String code, final boolean authorized) {
         this.id = id;
         this.code = code;
-        this.authorized =authorized;
+        this.authorized = authorized;
     }
 
     public Long getId() {
