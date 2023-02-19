@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import pl.terra.cloud_iot.TerraCloudIotApplication;
 import pl.terra.cloud_iot.domain.CollectingService;
-import pl.terra.cloud_iot.domain.DeviceService;
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
 import pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus;
 import pl.terra.cloud_iot.jpa.repository.DeviceRepository;
@@ -25,7 +24,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(classes = {TerraCloudIotApplication.class, TerraDeviceSimulatorApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class StatusRequestTest extends IntegrationTestBase{
+public class StatusRequestTest extends IntegrationTestBase {
     @Autowired
     SimulatorApi simulatorApi;
     @Autowired

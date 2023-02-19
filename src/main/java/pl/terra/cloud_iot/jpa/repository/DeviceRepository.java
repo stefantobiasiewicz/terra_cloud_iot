@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
-import pl.terra.common.mqtt.DeviceMqtt;
 
 import java.util.List;
 import java.util.Optional;

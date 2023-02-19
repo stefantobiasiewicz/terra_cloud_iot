@@ -3,11 +3,6 @@ package pl.terra.cloud_iot;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
-import pl.terra.cloud_iot.integration.IntegrationTestBase;
-import pl.terra.common.mqtt.MqttCore;
 import pl.terra.device.model.LightCmd;
 import pl.terra.device.model.MqttSystemMessage;
 

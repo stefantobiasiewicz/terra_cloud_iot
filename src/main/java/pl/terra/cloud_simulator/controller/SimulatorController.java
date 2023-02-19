@@ -27,7 +27,6 @@ import pl.terra.device.model.MessageType;
 import pl.terra.device.model.MqttSystemMessage;
 import pl.terra.device.model.StatusResp;
 import pl.terra.http.model.Connection;
-import pl.terra.http.model.Device;
 
 import java.io.File;
 import java.io.IOException;

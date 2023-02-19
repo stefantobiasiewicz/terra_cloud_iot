@@ -25,7 +25,7 @@ public class ControllerAdvisor {
     ResponseEntity<String> handleAlreadyExistException(Exception ex, WebRequest request) {
         ControllerAdvisor.logger.error(String.format("caught AlreadyExistException exception: '%s'", ex.getMessage()));
 
-        return new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
+        return new ResponseEntity<String>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
 }

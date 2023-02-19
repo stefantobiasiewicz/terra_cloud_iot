@@ -20,7 +20,7 @@ public class RandomWithDelay implements Serializable {
 
     public Double getRandom(final Double predict) {
         Random r = new Random();
-        double randomValue =  (double)r.nextInt( 100)/100;
+        double randomValue = (double) r.nextInt(100) / 100;
 
         double delta = (predict - prevGeneration) * randomValue;
 

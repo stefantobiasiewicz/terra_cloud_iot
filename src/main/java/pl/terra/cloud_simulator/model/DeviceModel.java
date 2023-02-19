@@ -24,7 +24,7 @@ public class DeviceModel implements Serializable {
     public DeviceModel(final String deviceCode) {
         this.deviceCode = deviceCode;
         lightOnOff = false;
-        doorsOpenClose =false;
+        doorsOpenClose = false;
         heaterOnOff = false;
         heaterSetTemp = 22.2f;
         fanOnOff = false;

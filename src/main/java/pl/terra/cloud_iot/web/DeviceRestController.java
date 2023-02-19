@@ -4,10 +4,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import pl.terra.cloud_iot.domain.DeviceService;
 import pl.terra.http.api.DeviceApi;
 import pl.terra.http.model.Device;
 import pl.terra.http.model.DeviceStatus;
-import pl.terra.cloud_iot.domain.DeviceService;
 
 import java.util.List;
 

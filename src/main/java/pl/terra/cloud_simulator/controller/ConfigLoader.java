@@ -4,11 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Map;
-import java.util.Objects;
 
 @Component
 public class ConfigLoader {

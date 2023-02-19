@@ -26,7 +26,7 @@ public class DeviceMqttController implements MqttDispatcher {
     public void handleMessage(DeviceEntity device, MqttSystemMessage message) throws SystemException {
         //DeviceMqttController.logger.debug(String.format("get message for device: '%s' and message: '%s'", device, message));
         DeviceMqttController.logger.debug(String.format("get message for device: '%s' and message type: '%s'", device, message.getType()));
-        if(device.getStatus() != DeviceStatus.READY) {
+        if (device.getStatus() != DeviceStatus.READY) {
             switch (message.getType()) {
                 case AUTHORIZE:
                     onboardingService.setStatusReady(device);

@@ -4,7 +4,6 @@ import pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Table(name = "devices")
 @Entity

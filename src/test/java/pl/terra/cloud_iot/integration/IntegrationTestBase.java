@@ -19,8 +19,8 @@ public abstract class IntegrationTestBase {
     static {
         MOSQUITO = new GenericContainer<>(DockerImageName.parse("eclipse-mosquitto:latest"))
                 .withExposedPorts(1883)
-                .withCopyFileToContainer(MountableFile.forClasspathResource("mqtt/mosquitto.conf"),"/mosquitto/config/mosquitto.conf")
-                .withCopyFileToContainer(MountableFile.forClasspathResource("mqtt/mosquitto.passwd"),"/mosquitto/config/mosquitto.passwd");
+                .withCopyFileToContainer(MountableFile.forClasspathResource("mqtt/mosquitto.conf"), "/mosquitto/config/mosquitto.conf")
+                .withCopyFileToContainer(MountableFile.forClasspathResource("mqtt/mosquitto.passwd"), "/mosquitto/config/mosquitto.passwd");
         MOSQUITO.start();
 
         mqttPort = MOSQUITO.getMappedPort(1883);

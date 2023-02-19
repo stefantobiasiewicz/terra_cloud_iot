@@ -1,12 +1,10 @@
 package pl.terra.cloud_iot.integration;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 import pl.terra.cloud_iot.TerraCloudIotApplication;
 import pl.terra.cloud_iot.domain.DeviceService;
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
@@ -26,7 +24,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = {TerraCloudIotApplication.class, TerraDeviceSimulatorApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class OnboardingTest extends IntegrationTestBase{
+public class OnboardingTest extends IntegrationTestBase {
     @Autowired
     OnboardingApi onboardingApi;
 

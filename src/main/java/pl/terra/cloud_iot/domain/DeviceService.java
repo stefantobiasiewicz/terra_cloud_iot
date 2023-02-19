@@ -15,11 +15,11 @@ import pl.terra.common.mqtt.DeviceMqtt;
 import pl.terra.device.model.MessageType;
 import pl.terra.device.model.MqttSystemMessage;
 import pl.terra.device.model.StatusResp;
-import pl.terra.http.model.*;
+import pl.terra.http.model.Device;
+import pl.terra.http.model.DeviceStatus;
+import pl.terra.http.model.DeviceStatusHeater;
+import pl.terra.http.model.EnvInfo;
 
-import java.net.URI;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -45,7 +45,7 @@ public class DeviceService {
     public DeviceStatus getDeviceStatus(Long userId, Long deviceId) throws SystemException, JsonProcessingException {
         final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndId(userId, deviceId);
 
-        if(devices.size() < 1) {
+        if (devices.size() < 1) {
             DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);
             throw new NotFoundException(String.format("can't find device for userId: %s and deviceId: %s", userId, deviceId));
         }

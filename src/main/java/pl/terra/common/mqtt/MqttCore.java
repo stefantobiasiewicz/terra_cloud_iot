@@ -11,7 +11,6 @@ import pl.terra.common.exception.MqttTimeoutException;
 import pl.terra.common.exception.NotFoundException;
 import pl.terra.common.exception.SystemException;
 import pl.terra.device.model.MqttSystemMessage;
-import pl.terra.device.model.StatusResp;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

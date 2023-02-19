@@ -1,7 +1,6 @@
 package pl.terra.cloud_iot.utils;
 
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
-import pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus;
 import pl.terra.common.mqtt.DeviceMqtt;
 import pl.terra.http.model.Device;
 
@@ -13,7 +12,7 @@ public class DeviceEntityUtils {
         final Device dev = new Device();
         dev.setId(device.getId());
         dev.setName(device.getName());
-        if(device.getImage()!=null) {
+        if (device.getImage() != null) {
             dev.setImage(URI.create(device.getImage()));
         }
         dev.setStatus(Device.StatusEnum.valueOf(device.getStatus().getValue()));
