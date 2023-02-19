@@ -104,8 +104,9 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
             DeviceModel model = cacheV2.get(s);
             if (model != null) {
                 devicePairs.add(new DevicePair(aLong, s, true));
+            } else {
+                devicePairs.add(new DevicePair(aLong, s, false));
             }
-            devicePairs.add(new DevicePair(aLong, s, false));
         });
 
         return ResponseEntity.ok(devicePairs);
