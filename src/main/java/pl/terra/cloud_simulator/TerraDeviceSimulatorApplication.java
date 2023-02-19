@@ -11,10 +11,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = {"pl.terra.common.*", "pl.terra.cloud_simulator.*"})
-//@EnableAutoConfiguration(exclude = {
-//        DataSourceAutoConfiguration.class,
-//        DataSourceTransactionManagerAutoConfiguration.class,
-//        HibernateJpaAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = {
+        DataSourceAutoConfiguration.class,
+        DataSourceTransactionManagerAutoConfiguration.class,
+        HibernateJpaAutoConfiguration.class})
 // todo important
 public class TerraDeviceSimulatorApplication {
     public static void main(String[] args) {
