@@ -3,7 +3,9 @@ server:
 
 spring:
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+    exclude:  org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration, \
+        org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration, \
+        org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
 
 mqtt:
   broker: ${MQTT_BROKER:tcp://localhost:1883}

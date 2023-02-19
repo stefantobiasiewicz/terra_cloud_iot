@@ -7,6 +7,8 @@ spring:
     hibernate:
       ddl-auto: create-drop
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  autoconfigure:
+    exclude: pl.terra.cloud_iot.config.WebConfiguration \ pl.terra.cloud_simulator.controller.WebConfiguration
 
 
 simulator:

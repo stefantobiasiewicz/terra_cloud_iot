@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import pl.terra.common.exception.SystemException;
 import pl.terra.common.mqtt.DeviceMqtt;
 import pl.terra.common.mqtt.MqttCore;
+import pl.terra.device.model.MessageType;
 import pl.terra.device.model.MqttSystemMessage;
 
 import java.util.ArrayList;
@@ -35,6 +36,10 @@ public class DeviceMqttDriver extends MqttCore {
 
     @Override
     protected void messageArrived(final DeviceMqtt deviceMqtt, final MqttSystemMessage message) throws SystemException {
+        if (message.getType() == MessageType.PING) {
+            message.setType(MessageType.OK);
+            this.sendToBackend(deviceMqtt, message);
+        }
         for (final MqttDispatcher dispatcher : dispatchers) {
             dispatcher.handleMessage(deviceMqtt, message);
         }
