@@ -65,6 +65,7 @@ public class DeviceService {
         result.setDevice(DeviceEntityUtils.mapToDevice(devices.get(0)));
         result.setDoors(payload.getDoors());
         result.setFan(payload.getFan());
+        result.setLight(payload.getLight());
 
         final DeviceStatusHeater heater = new DeviceStatusHeater();
         heater.setOnOff(payload.getHeater().getOnOff());
