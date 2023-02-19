@@ -5,9 +5,12 @@ public class DevicePair {
     private Long id;
     private String code;
 
-    public DevicePair(final Long id, final String code) {
+    private boolean authorized;
+
+    public DevicePair(final Long id, final String code, final boolean authorized) {
         this.id = id;
         this.code = code;
+        this.authorized =authorized;
     }
 
     public Long getId() {
@@ -16,5 +19,9 @@ public class DevicePair {
 
     public String getCode() {
         return code;
+    }
+
+    public boolean isAuthorized() {
+        return authorized;
     }
 }

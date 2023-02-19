@@ -109,7 +109,11 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
         List<DevicePair> devicePairs = new ArrayList<>();
 
         devicesHardCoded.forEach((aLong, s) -> {
-            devicePairs.add(new DevicePair(aLong, s));
+            DeviceModel model = cacheV2.get(s);
+            if (model != null) {
+                devicePairs.add(new DevicePair(aLong, s, true));
+            }
+            devicePairs.add(new DevicePair(aLong, s, false));
         });
 
         return ResponseEntity.ok(devicePairs);
