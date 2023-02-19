@@ -5,22 +5,19 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import pl.terra.cloud_iot.TerraCloudIotApplication;
 import pl.terra.cloud_iot.domain.CollectingService;
+import pl.terra.cloud_iot.domain.DeviceService;
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
 import pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus;
 import pl.terra.cloud_iot.jpa.repository.DeviceRepository;
 import pl.terra.cloud_simulator.TerraDeviceSimulatorApplication;
 import pl.terra.cloud_simulator.controller.SimulatorApi;
+import pl.terra.http.api.DeviceApi;
 import pl.terra.http.api.OnboardingApi;
 
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
@@ -28,11 +25,13 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(classes = {TerraCloudIotApplication.class, TerraDeviceSimulatorApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class CollectingDataTest extends IntegrationTestBase{
+public class StatusRequestTest extends IntegrationTestBase{
     @Autowired
     SimulatorApi simulatorApi;
     @Autowired
     OnboardingApi onboardingApi;
+    @Autowired
+    DeviceApi deviceApi;
     @Autowired
     DeviceRepository deviceRepository;
 
@@ -41,7 +40,7 @@ public class CollectingDataTest extends IntegrationTestBase{
 
     @BeforeAll
     void prepareDevices() throws Exception {
-        final Long userId = 1L;
+        final Long userId = 5L;
         final String deviceCode = simulatorApi.getDeviceCode(userId).getBody();
 
         // suer call
@@ -58,8 +57,21 @@ public class CollectingDataTest extends IntegrationTestBase{
     }
 
     @Test
-    void checkIfDeviceSendData() {
-        await().until(() -> collectingService.getEnvInfo(5L).size() == 5);
+    void checkUserRequestDeviceForStatusData() throws Exception {
+        final Long userId = 5L;
+        final String deviceCode = simulatorApi.getDeviceCode(userId).getBody();
+        final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
+
+        Assertions.assertNotNull(testResult);
+        final Long deviceId = testResult.getId();
+
+
+        ResponseEntity<pl.terra.http.model.DeviceStatus> statusResponse = deviceApi.get(userId, deviceId);
+
+        pl.terra.http.model.DeviceStatus status = statusResponse.getBody();
+
+        Assertions.assertNotNull(status);
+        Assertions.assertEquals(deviceId, status.getDevice().getId());
     }
 
 }

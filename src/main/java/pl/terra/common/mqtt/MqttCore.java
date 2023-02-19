@@ -8,8 +8,10 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import pl.terra.common.Arguments;
 import pl.terra.common.exception.MqttTimeoutException;
+import pl.terra.common.exception.NotFoundException;
 import pl.terra.common.exception.SystemException;
 import pl.terra.device.model.MqttSystemMessage;
+import pl.terra.device.model.StatusResp;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -190,12 +192,12 @@ public abstract class MqttCore implements MqttCallback {
         } catch (JsonProcessingException e) {
             final String errorMessage =
                     String.format("can't parse payload form mqtt: '%s' on topic: '%s' to system message.",
-                            new String(mqttMessage.getPayload()) , topic);
+                            new String(mqttMessage.getPayload()), topic);
             MqttCore.logger.error(errorMessage, e);
             throw new SystemException(errorMessage);
         }
 
-        if(messageMap.containsKey(message.getMessageId())) {
+        if (messageMap.containsKey(message.getMessageId())) {
             messageMap.put(message.getMessageId(), message);
             return;
         }
@@ -204,7 +206,7 @@ public abstract class MqttCore implements MqttCallback {
                 .filter(e -> e.getToDeviceTopic().equals(topic) || e.getToServiceTopic().equals(topic))
                 .findFirst()
                 .orElse(null);
-        if(deviceMqtt == null) {
+        if (deviceMqtt == null) {
             throw new SystemException(String.format("can't find device in registered devices for topic: '%s'.", topic));
         }
 
@@ -217,4 +219,21 @@ public abstract class MqttCore implements MqttCallback {
     }
 
     protected abstract void messageArrived(DeviceMqtt deviceMqtt, MqttSystemMessage message) throws SystemException;
+
+    public DeviceMqtt getDeviceById(Long deviceId) throws NotFoundException {
+        return registeredDeviceMqtts.stream()
+                .filter(deviceMqtt -> deviceMqtt.getId() == deviceId)
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(String.format("can't find deivce in mqtt core with id: %d", deviceId)));
+    }
+
+    public static <T> T getPayloadClass(MqttSystemMessage message, Class<T> clazz) throws SystemException {
+        final ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(mapper.writeValueAsString(message.getPayload()), clazz);
+        } catch (JsonProcessingException e) {
+            MqttCore.logger.error("can't parse message: '{}' on class: '{}'", message, clazz);
+            throw new SystemException(String.format("can't parse message: '%s'", message));
+        }
+    }
 }

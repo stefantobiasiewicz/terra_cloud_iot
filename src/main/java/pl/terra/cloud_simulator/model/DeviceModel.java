@@ -7,7 +7,7 @@ import pl.terra.device.model.StatusRespHeater;
 
 import java.io.Serializable;
 
-public class Device implements Serializable {
+public class DeviceModel implements Serializable {
     private final String deviceCode;
     private DeviceMqtt deviceMqtt;
     private boolean lightOnOff;
@@ -21,7 +21,7 @@ public class Device implements Serializable {
     private boolean humidifierOnOff;
 
 
-    public Device(final String deviceCode) {
+    public DeviceModel(final String deviceCode) {
         this.deviceCode = deviceCode;
         lightOnOff = false;
         doorsOpenClose =false;

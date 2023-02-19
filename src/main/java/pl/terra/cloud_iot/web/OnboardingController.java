@@ -21,7 +21,7 @@ public class OnboardingController implements OnboardingApi {
 
     @Override
     public ResponseEntity<Void> addDeviceToPoolList(final Long userId, final String deviceCode) throws Exception {
-        OnboardingController.logger.debug(String.format("Adding device to pool list with userId: %d and device code: '%s'", userId, deviceCode));
+        OnboardingController.logger.info(String.format("Adding device to pool list with userId: %d and device code: '%s'", userId, deviceCode));
 
         onboardingService.addToPool(userId, deviceCode);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -29,7 +29,7 @@ public class OnboardingController implements OnboardingApi {
 
     @Override
     public ResponseEntity<Connection> getConnection(String deviceCode) throws Exception {
-        OnboardingController.logger.debug(String.format("getting connection device with device code: '%s'", deviceCode));
+        OnboardingController.logger.info(String.format("getting connection device with device code: '%s'", deviceCode));
 
         final Connection connection = onboardingService.getConnection(deviceCode);
 

@@ -22,13 +22,15 @@ public class DeviceRestController implements DeviceApi {
     }
 
     @Override
-    public ResponseEntity<List<DeviceStatus>> get(Long userId, Long deviceId) throws Exception {
-        return DeviceApi.super.get(userId, deviceId);
+    public ResponseEntity<DeviceStatus> get(Long userId, Long deviceId) throws Exception {
+        DeviceRestController.logger.info("getting device status for user: {} and deviceId: {}", userId, deviceId);
+
+        return ResponseEntity.ok(deviceService.getDeviceStatus(userId, deviceId));
     }
 
     @Override
     public ResponseEntity<List<Device>> getAll(Long userId) throws Exception {
-        DeviceRestController.logger.debug("getting all device for user: {}", userId);
+        DeviceRestController.logger.info("getting all device for user: {}", userId);
 
         final List<Device> devices = deviceService.getAllForUser(userId);
 

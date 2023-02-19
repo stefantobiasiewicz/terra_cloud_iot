@@ -10,9 +10,16 @@ import pl.terra.common.mqtt.MqttCore;
 import pl.terra.device.model.MessageType;
 import pl.terra.device.model.MqttSystemMessage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class DeviceMqttDriver extends MqttCore {
     private static final Logger logger = LogManager.getLogger(DeviceMqttDriver.class);
+
+    private final List<MqttDispatcher> dispatchers = new ArrayList<>();
+
+
     public DeviceMqttDriver(@Value("${mqtt.broker}") final String brokerUrl, @Value("${mqtt.username}") final String username,
                             @Value("${mqtt.password}") final String password) throws SystemException {
         super(brokerUrl, username, password, "device-simulator");
@@ -23,14 +30,15 @@ public class DeviceMqttDriver extends MqttCore {
         publish(deviceMqtt.getToServiceTopic(), message);
     }
 
+    public void addDispatcher(MqttDispatcher mqttDispatcher) {
+        dispatchers.add(mqttDispatcher);
+    }
+
     @Override
     protected void messageArrived(final DeviceMqtt deviceMqtt, final MqttSystemMessage message) throws SystemException {
-        final MqttSystemMessage response = new MqttSystemMessage();
-        response.setMessageId(message.getMessageId());
-        response.setType(MessageType.OK);
-        response.setPayload(null);
-        sendToBackend(deviceMqtt, response);
-
+        for (final MqttDispatcher dispatcher : dispatchers) {
+            dispatcher.handleMessage(deviceMqtt, message);
+        }
     }
 
 }

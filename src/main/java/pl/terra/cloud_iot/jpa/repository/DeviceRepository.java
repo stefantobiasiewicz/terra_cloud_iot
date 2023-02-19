@@ -18,4 +18,6 @@ public interface DeviceRepository extends JpaRepository<DeviceEntity, Long> {
     Optional<DeviceEntity> findByDeviceMqtt(@Param("toDeviceTopic") String toDeviceTopic, @Param("toServiceTopic") String toServiceTopic);
 
     List<DeviceEntity> findAllByUserId(Long userId);
+
+    List<DeviceEntity> findAllByUserIdAndId(Long userId, Long deviceId);
 }

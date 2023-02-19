@@ -110,9 +110,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DeviceStatus'
+                $ref: '#/components/schemas/DeviceStatus'
         '400':
           description: Bad parameters
         '404':
@@ -143,9 +141,40 @@ components:
           enum:
             - PENDING
             - READY
+    ModelDouble:
+      type: number
+      format: double
+    EnvInfo:
+      type: object
+      properties:
+        temperature:
+          $ref: '#/components/schemas/ModelDouble'
+        humidity:
+          $ref: '#/components/schemas/ModelDouble'
+        pressure:
+          $ref: '#/components/schemas/ModelDouble'
     DeviceStatus:
       type: object
       properties:
         device:
           $ref: '#/components/schemas/Device'
+        envInfo:
+          $ref: '#/components/schemas/EnvInfo'
+        light:
+          type: boolean
+        doors:
+          type: boolean
+        heater:
+          type: object
+          properties:
+            onOff:
+              type: boolean
+            setTemp:
+              type: number
+              format: double
+        fan:
+          type: boolean
+        humidifier:
+          type: boolean
+
 

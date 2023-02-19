@@ -56,6 +56,7 @@ public class OnboardingService {
         final DeviceMqtt deviceMqtt = new DeviceMqtt();
         deviceMqtt.setToServiceTopic(entity.getToServiceTopic());
         deviceMqtt.setToDeviceTopic(entity.getToDeviceTopic());
+        deviceMqtt.setId(entity.getId());
         serviceMqttDriver.registerDevice(deviceMqtt);
     }
 

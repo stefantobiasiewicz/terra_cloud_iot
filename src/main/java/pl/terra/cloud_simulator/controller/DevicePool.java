@@ -1,6 +1,6 @@
 package pl.terra.cloud_simulator.controller;
 
-import pl.terra.cloud_simulator.model.Device;
+import pl.terra.cloud_simulator.model.DeviceModel;
 
 import java.io.*;
 import java.util.LinkedHashSet;
@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.Set;
 
 public class DevicePool implements Serializable {
-    private final Set<Device> pool;
+    private final Set<DeviceModel> pool;
 
 
-    public DevicePool(final Set<Device> pool) {
+    public DevicePool(final Set<DeviceModel> pool) {
         this.pool = pool;
     }
 
-    public Device get(final String code) {
+    public DeviceModel get(final String code) {
         return pool.stream()
                 .filter(device -> device.getDeviceCode().equals(code))
                 .findFirst()
@@ -24,10 +24,10 @@ public class DevicePool implements Serializable {
 
 
     public static DevicePool formCodes(final List<String> list) {
-        Set<Device> deviceSet = new LinkedHashSet<>();
+        Set<DeviceModel> deviceSet = new LinkedHashSet<>();
 
         for (final String code : list) {
-            deviceSet.add(new Device(code));
+            deviceSet.add(new DeviceModel(code));
         }
 
         return new DevicePool(deviceSet);

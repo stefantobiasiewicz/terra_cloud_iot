@@ -2,6 +2,8 @@ package pl.terra.cloud_simulator.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -14,14 +16,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import pl.terra.cloud_simulator.model.DeviceModel;
 import pl.terra.cloud_simulator.mqtt.DeviceMqttDriver;
+import pl.terra.cloud_simulator.mqtt.MqttDispatcher;
 import pl.terra.cloud_simulator.rng.RandomWithDelay;
 import pl.terra.common.exception.SystemException;
 import pl.terra.common.mqtt.DeviceMqtt;
 import pl.terra.device.model.EnvInfo;
 import pl.terra.device.model.MessageType;
 import pl.terra.device.model.MqttSystemMessage;
+import pl.terra.device.model.StatusResp;
 import pl.terra.http.model.Connection;
+import pl.terra.http.model.Device;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,15 +38,17 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-public class SimulatorController implements SimulatorApi {
-
+public class SimulatorController implements SimulatorApi, MqttDispatcher {
+    private static final Logger logger = LogManager.getLogger(SimulatorController.class);
     private final ConfigLoader configLoader;
     private final DeviceMqttDriver deviceMqttDrive;
     private final String serverBaseUrl;
     private RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper mapper = new ObjectMapper();
-    private final Map<Long, String> devices = new HashMap<>();
+    private final Map<Long, String> devicesHardCoded = new HashMap<>();
     private Map<String, Map<String, Object>> cache = new HashMap<>();
+
+    private Map<String, DeviceModel> cacheV2 = new HashMap<>();
 
     public SimulatorController(ConfigLoader configLoader, DeviceMqttDriver deviceMqttDrive, @Value("${simulator.backend.url}") final String serverPort, @Value("${example-devices}") final String pathToExamples) throws IOException, URISyntaxException {
         this.configLoader = configLoader;
@@ -52,7 +60,7 @@ public class SimulatorController implements SimulatorApi {
 
         Long i = 0L;
         for (final String device : deviceCodes) {
-            devices.put(i++, device);
+            devicesHardCoded.put(i++, device);
         }
 
         this.serverBaseUrl = serverPort;
@@ -61,7 +69,10 @@ public class SimulatorController implements SimulatorApi {
         Map<String, Map<String, Object>> state = configLoader.readState();
         if (state != null) {
             cache = state;
+            // todo tutja dodac subskrybowanie topikow po odpaleniu
         }
+
+        deviceMqttDrive.addDispatcher(this);
     }
 
     @Scheduled(fixedDelay = 1000)
@@ -95,19 +106,19 @@ public class SimulatorController implements SimulatorApi {
     @Override
     @GetMapping("/device/get/all")
     public ResponseEntity<List<Map.Entry<Long, String>>> getAllDeviceIds() {
-        return ResponseEntity.ok(new ArrayList<>(devices.entrySet()));
+        return ResponseEntity.ok(new ArrayList<>(devicesHardCoded.entrySet()));
     }
 
     @Override
     @GetMapping("/device/get/code/{id}")
     public ResponseEntity<String> getDeviceCode(@PathVariable(name = "id") final Long id) {
-        return ResponseEntity.ok(devices.get(id));
+        return ResponseEntity.ok(devicesHardCoded.get(id));
     }
 
     @Override
     @PostMapping("/device/authorize/{id}")
     public ResponseEntity<String> authorizeDevice(@PathVariable(name = "id") final Long id) throws SystemException {
-        final String deviceCode = devices.get(id);
+        final String deviceCode = devicesHardCoded.get(id);
 
         final String url = String.format("%s/device/connection/%s", serverBaseUrl, deviceCode);
 
@@ -116,7 +127,7 @@ public class SimulatorController implements SimulatorApi {
             connection = restTemplate.exchange(url, HttpMethod.GET,
                     new HttpEntity<>(null), Connection.class).getBody();
         } catch (HttpClientErrorException e) {
-            if(e.getStatusCode() == HttpStatus.NOT_FOUND) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 return ResponseEntity.status(404).body("can't find device on backend");
             }
             return ResponseEntity.status(500).body("error calling backend");
@@ -124,8 +135,13 @@ public class SimulatorController implements SimulatorApi {
 
 
         final DeviceMqtt deviceMqtt = new DeviceMqtt();
+        deviceMqtt.setId(id);
         deviceMqtt.setToDeviceTopic(connection.getToDeviceTopic());
         deviceMqtt.setToServiceTopic(connection.getToServiceTopic());
+
+        DeviceModel model = new DeviceModel(deviceCode);
+        model.setDeviceMqtt(deviceMqtt);
+        cacheV2.put(deviceCode, model);
 
         cache.put(deviceCode, new HashMap<>());
         cache.get(deviceCode).put("device", deviceMqtt);
@@ -143,9 +159,44 @@ public class SimulatorController implements SimulatorApi {
         authorize.setType(MessageType.AUTHORIZE);
         authorize.setPayload(null);
 
+        deviceMqttDrive.registerService(deviceMqtt);
         deviceMqttDrive.sendToBackend(deviceMqtt, authorize);
 
         configLoader.saveState(cache);
         return null;
+    }
+
+    private DeviceModel getDeviceProperties(final DeviceMqtt deviceMqtt) {
+        final String code = cacheV2.keySet().stream().filter(s -> cacheV2.get(s).getDeviceMqtt().equals(deviceMqtt))
+                .findFirst().orElse(null);
+        if (code == null) {
+            SimulatorController.logger.error("can't find device: '{}' in cache: {}", deviceMqtt, cache);
+            return null;
+        }
+        return cacheV2.get(code);
+    }
+
+    @Override
+    public void handleMessage(DeviceMqtt device, MqttSystemMessage message) throws SystemException {
+        switch (message.getType()) {
+            case STATUS_REQ: {
+                final DeviceModel deviceModel = getDeviceProperties(device);
+                if (deviceModel == null) {
+                    return;
+                }
+
+                final MqttSystemMessage response = new MqttSystemMessage();
+                response.setMessageId(message.getMessageId());
+                response.setType(MessageType.STATUS_RESP);
+
+                final StatusResp statusResponse = deviceModel.asStatusResp();
+
+                response.setPayload(statusResponse);
+                deviceMqttDrive.sendToBackend(device, response);
+            }
+            break;
+            default:
+                break;
+        }
     }
 }
