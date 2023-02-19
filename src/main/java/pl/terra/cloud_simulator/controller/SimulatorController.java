@@ -10,10 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import pl.terra.cloud_simulator.dto.DevicePair;
@@ -119,6 +116,27 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
     public ResponseEntity<String> getDeviceCode(@PathVariable(name = "id") final Long id) {
         return ResponseEntity.ok(devicesHardCoded.get(id));
     }
+
+    @Override
+    @GetMapping("/device/get/status/{id}")
+    public ResponseEntity<DeviceModel> getDeviceStatus(@PathVariable(name = "id") final Long id) {
+        final DeviceModel response = cacheV2.get(devicesHardCoded.get(id));
+        if (response != null) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @Override
+    @PostMapping("/device/get/status/{id}")
+    public ResponseEntity<DeviceModel> setDeviceStatus(@RequestBody final DeviceModel model) {
+        final DeviceModel response = cacheV2.get(model.getDeviceCode());
+        if (response != null) {
+            return ResponseEntity.ok(cacheV2.put(model.getDeviceCode(), model));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
 
     @Override
     @PostMapping("/device/authorize/{id}")
