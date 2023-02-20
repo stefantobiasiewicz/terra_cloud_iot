@@ -178,7 +178,7 @@ paths:
           description: Bad parameters
         '404':
           description: Device not found
-  /device/name/{userId}/{deviceId}/{newName}:
+  /device/name/{userId}/{deviceId}:
     post:
       tags:
         - device
@@ -199,12 +199,14 @@ paths:
           schema:
             type: integer
             format: int64
-        - name: newName
-          in: path
-          description: unique ID of Device
-          required: true
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
       responses:
         '200':
           description: Successful operation

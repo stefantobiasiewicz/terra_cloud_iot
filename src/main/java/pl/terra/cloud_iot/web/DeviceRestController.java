@@ -10,6 +10,7 @@ import pl.terra.http.api.DeviceApi;
 import pl.terra.http.model.Device;
 import pl.terra.http.model.DeviceStatus;
 import pl.terra.http.model.DeviceUpdate;
+import pl.terra.http.model.InlineObject;
 
 import java.util.List;
 
@@ -54,11 +55,12 @@ public class DeviceRestController implements DeviceApi {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @Override
-    public ResponseEntity<DeviceStatus> setNewName(Long userId, Long deviceId, String newName) throws Exception {
-        DeviceRestController.logger.info("setting new name for device: {} for user: {} and new name: {}", deviceId, userId, newName);
 
-        deviceService.setNewName(userId, deviceId, newName);
+    @Override
+    public ResponseEntity<DeviceStatus> setNewName(Long userId, Long deviceId, InlineObject inlineObject) throws Exception {
+        DeviceRestController.logger.info("setting new name for device: {} for user: {} and new name: {}", deviceId, userId, inlineObject.getName());
+
+        deviceService.setNewName(userId, deviceId, inlineObject.getName());
 
         return ResponseEntity.ok(deviceService.getDeviceStatus(userId, deviceId));
     }
