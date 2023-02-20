@@ -195,6 +195,8 @@ components:
           format: int64
         name:
           type: string
+        code:
+          type: string
         image:
           type: string
           format: uri

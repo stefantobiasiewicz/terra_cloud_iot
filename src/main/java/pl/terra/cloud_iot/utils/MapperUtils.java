@@ -22,6 +22,7 @@ public class MapperUtils {
         final Device dev = new Device();
         dev.setId(device.getId());
         dev.setName(device.getName());
+        dev.setCode(device.getFactoryCode());
         if (device.getImage() != null) {
             dev.setImage(URI.create(device.getImage()));
         }
