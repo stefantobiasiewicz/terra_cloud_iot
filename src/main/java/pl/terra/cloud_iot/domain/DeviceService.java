@@ -130,4 +130,23 @@ public class DeviceService {
 
         throw new SystemException("can't remove device");
     }
+
+    public void setNewName(final Long userId, final Long deviceId, final String newName) throws NotFoundException {
+        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndActive(userId, deviceId);
+
+        if (devices.size() < 1) {
+            DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);
+            throw new NotFoundException(String.format("can't find device for userId: %s and deviceId: %s", userId, deviceId));
+        }
+
+        if(devices.get(0).getStatus() != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.READY) {
+            throw new ConflictException("device is not in state READY");
+        }
+
+        final DeviceEntity deviceEntity = devices.get(0);
+
+        deviceEntity.setName(newName);
+
+        deviceRepository.save(deviceEntity);
+    }
 }

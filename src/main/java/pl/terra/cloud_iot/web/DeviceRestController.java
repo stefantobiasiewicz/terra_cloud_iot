@@ -53,4 +53,13 @@ public class DeviceRestController implements DeviceApi {
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @Override
+    public ResponseEntity<DeviceStatus> setNewName(Long userId, Long deviceId, String newName) throws Exception {
+        DeviceRestController.logger.info("setting new name for device: {} for user: {} and new name: {}", deviceId, userId, newName);
+
+        deviceService.setNewName(userId, deviceId, newName);
+
+        return ResponseEntity.ok(deviceService.getDeviceStatus(userId, deviceId));
+    }
 }

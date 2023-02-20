@@ -87,7 +87,7 @@ paths:
     get:
       tags:
         - device
-      description: Endpoint for getting info of device task -> 'Status urządzenia'
+      description: get device status
       operationId: get
       parameters:
         - name: userId
@@ -118,7 +118,7 @@ paths:
     post:
       tags:
         - device
-      description: Endpoint for getting info of device task -> 'Status urządzenia'
+      description: updating properties of device
       operationId: update
       parameters:
         - name: userId
@@ -154,7 +154,7 @@ paths:
     delete:
       tags:
         - device
-      description: Endpoint for getting info of device task -> 'Status urządzenia'
+      description: deleting device
       operationId: delete
       parameters:
         - name: userId
@@ -174,6 +174,44 @@ paths:
       responses:
         '200':
           description: Successful operation
+        '400':
+          description: Bad parameters
+        '404':
+          description: Device not found
+  /device/name/{userId}/{deviceId}/{newName}:
+    post:
+      tags:
+        - device
+      description: setting name of device
+      operationId: setNewName
+      parameters:
+        - name: userId
+          in: path
+          description: unique ID of user
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: deviceId
+          in: path
+          description: unique ID of Device
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: newName
+          in: path
+          description: unique ID of Device
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceStatus'
         '400':
           description: Bad parameters
         '404':
