@@ -46,7 +46,7 @@ public class CollectingDataTest extends IntegrationTestBase {
         Assertions.assertEquals(HttpStatus.OK, simulatorApi.authorizeDevice(userId).getStatusCode());
 
         await().until(() -> {
-            final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
+            final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
             Assertions.assertNotNull(testResult);
             return testResult.getStatus() == DeviceStatus.READY;
         });
@@ -54,7 +54,11 @@ public class CollectingDataTest extends IntegrationTestBase {
 
     @Test
     void checkIfDeviceSendData() {
-        await().until(() -> collectingService.getEnvInfo(5L).size() == 5);
+        final Long userId = 1L;
+        final String deviceCode = simulatorApi.getDeviceCode(userId).getBody();
+        final DeviceEntity device = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
+
+        await().until(() -> collectingService.getEnvInfo(device).size() == 5);
     }
 
 }

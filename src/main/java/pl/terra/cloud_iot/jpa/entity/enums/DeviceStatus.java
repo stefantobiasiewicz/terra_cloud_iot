@@ -2,7 +2,8 @@ package pl.terra.cloud_iot.jpa.entity.enums;
 
 public enum DeviceStatus {
     PENDING(1, "PENDING"),
-    READY(2, "READY");
+    READY(2, "READY"),
+    DELETED(3, "DELETED");
     private final int id;
     private final String value;
 

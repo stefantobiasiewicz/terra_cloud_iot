@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
 import pl.terra.cloud_iot.jpa.repository.DeviceRepository;
 import pl.terra.cloud_iot.mqtt.ServiceMqttDriver;
@@ -15,7 +16,6 @@ import pl.terra.common.mqtt.DeviceMqtt;
 import pl.terra.device.model.MessageType;
 import pl.terra.device.model.MqttSystemMessage;
 import pl.terra.device.model.StatusResp;
-import pl.terra.device.model.UpdateRequest;
 import pl.terra.http.model.*;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public class DeviceService {
     }
 
     public DeviceStatus getDeviceStatus(Long userId, Long deviceId) throws SystemException, JsonProcessingException {
-        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndId(userId, deviceId);
+        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndActive(userId, deviceId);
 
         if (devices.size() < 1) {
             DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);
@@ -63,7 +63,7 @@ public class DeviceService {
     }
 
     public DeviceStatus updateDevice(final Long userId, final Long deviceId, final DeviceUpdate deviceUpdate) throws SystemException {
-        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndId(userId, deviceId);
+        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndActive(userId, deviceId);
 
         if (devices.size() < 1) {
             DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);
@@ -83,5 +83,36 @@ public class DeviceService {
         StatusResp payload = ServiceMqttDriver.getPayloadClass(response, StatusResp.class);
 
         return MapperUtils.mapToDeviceStatus(payload, devices.get(0));
+    }
+
+    @Transactional
+    public void delete(final Long userId, final Long deviceId) throws SystemException {
+        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndActive(userId, deviceId);
+
+        if (devices.size() < 1) {
+            DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);
+            throw new NotFoundException(String.format("can't find device for userId: %s and deviceId: %s", userId, deviceId));
+        }
+
+        final DeviceEntity deviceEntity = devices.get(0);
+
+        deviceEntity.setStatus(pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.DELETED);
+        deviceRepository.save(deviceEntity);
+
+        final MqttSystemMessage request = new MqttSystemMessage();
+        request.setType(MessageType.DELETE_REQ);
+        request.setMessageId(new Random().nextLong());
+
+        DeviceMqtt device = serviceMqttDriver.getDeviceById(deviceId);
+
+        DeviceService.logger.info("deleting device: '{}' by: '{}'", device, request);
+        final MqttSystemMessage response = serviceMqttDriver.exchange(device, request, 10000L);
+
+        if(response.getType() == MessageType.OK) {
+            serviceMqttDriver.remove(device);
+            return;
+        }
+
+        throw new SystemException("can't remove device");
     }
 }

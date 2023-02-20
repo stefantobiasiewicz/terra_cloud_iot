@@ -151,6 +151,33 @@ paths:
           description: Bad parameters
         '404':
           description: Device not found
+    delete:
+      tags:
+        - device
+      description: Endpoint for getting info of device task -> 'Status urządzenia'
+      operationId: delete
+      parameters:
+        - name: userId
+          in: path
+          description: unique ID of user
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: deviceId
+          in: path
+          description: unique ID of Device
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad parameters
+        '404':
+          description: Device not found
 components:
   schemas:
     Connection:

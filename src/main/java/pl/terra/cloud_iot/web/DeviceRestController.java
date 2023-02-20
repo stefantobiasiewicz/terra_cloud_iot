@@ -2,6 +2,7 @@ package pl.terra.cloud_iot.web;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import pl.terra.cloud_iot.domain.DeviceService;
@@ -43,5 +44,13 @@ public class DeviceRestController implements DeviceApi {
         DeviceRestController.logger.info("updating device properties all device for user: {}, props: '{}'", userId, deviceUpdate);
 
         return ResponseEntity.ok(deviceService.updateDevice(userId, deviceId, deviceUpdate));
+    }
+
+    @Override
+    public ResponseEntity<Void> delete(Long userId, Long deviceId) throws Exception {
+        DeviceRestController.logger.info("deleting device {} for user: {}.", userId, deviceId);
+        deviceService.delete(userId, deviceId);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

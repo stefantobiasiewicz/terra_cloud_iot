@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import pl.terra.cloud_iot.TerraCloudIotApplication;
-import pl.terra.cloud_iot.domain.CollectingService;
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
 import pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus;
 import pl.terra.cloud_iot.jpa.repository.DeviceRepository;
@@ -48,7 +47,7 @@ public class StatusRequestTest extends IntegrationTestBase {
         Assertions.assertEquals(HttpStatus.OK, simulatorApi.authorizeDevice(userId).getStatusCode());
 
         await().until(() -> {
-            final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
+            final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
             Assertions.assertNotNull(testResult);
             return testResult.getStatus() == DeviceStatus.READY;
         });
@@ -58,7 +57,7 @@ public class StatusRequestTest extends IntegrationTestBase {
     void checkUserRequestDeviceForStatusData() throws Exception {
         final Long userId = 7L;
         final String deviceCode = simulatorApi.getDeviceCode(userId).getBody();
-        final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
+        final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
 
         Assertions.assertNotNull(testResult);
         final Long deviceId = testResult.getId();

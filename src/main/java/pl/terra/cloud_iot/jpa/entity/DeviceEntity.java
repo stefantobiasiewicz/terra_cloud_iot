@@ -12,7 +12,7 @@ public class DeviceEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "factory_code", nullable = false, unique = true)
+    @Column(name = "factory_code", nullable = false)
     private String factoryCode;
     @Column(name = "created_at", nullable = false)
     private LocalDate createdAt;

@@ -69,7 +69,7 @@ public class CollectingService {
     }
 
 
-    public List<EnvInfoEntity> getEnvInfo(final Long n) {
-        return envInfoRepository.findAll(Pageable.ofSize(n.intValue())).toList();
+    public List<EnvInfoEntity> getEnvInfo(final DeviceEntity device) {
+        return envInfoRepository.findAllByDevice(device);
     }
 }

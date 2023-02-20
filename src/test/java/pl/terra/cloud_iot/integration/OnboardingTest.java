@@ -67,12 +67,12 @@ public class OnboardingTest extends IntegrationTestBase {
         deviceMqttDriver.sendToBackend(deviceMqtt, authorizeMessage);
 
         await().until(() -> {
-            final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
+            final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
             Assertions.assertNotNull(testResult);
             return testResult.getStatus() == DeviceStatus.READY;
         });
 
-        final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
+        final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
         Assertions.assertNotNull(testResult);
         Assertions.assertEquals(DeviceStatus.READY, testResult.getStatus());
         Assertions.assertEquals(userId, testResult.getUserId());
@@ -92,12 +92,12 @@ public class OnboardingTest extends IntegrationTestBase {
         simulatorApi.authorizeDevice(userId);
 
         await().until(() -> {
-            final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
+            final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
             Assertions.assertNotNull(testResult);
             return testResult.getStatus() == DeviceStatus.READY;
         });
 
-        final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
+        final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
         Assertions.assertNotNull(testResult);
         Assertions.assertEquals(DeviceStatus.READY, testResult.getStatus());
         Assertions.assertEquals(userId, testResult.getUserId());

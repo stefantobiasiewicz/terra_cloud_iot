@@ -206,6 +206,22 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
     @Override
     public void handleMessage(DeviceMqtt device, MqttSystemMessage message) throws SystemException {
         switch (message.getType()) {
+            case DELETE_REQ: {
+                final DeviceModel deviceModel = getDeviceProperties(device);
+                if (deviceModel == null) {
+                    return;
+                }
+
+                final MqttSystemMessage response = new MqttSystemMessage();
+                response.setMessageId(message.getMessageId());
+                response.setType(MessageType.OK);
+                deviceMqttDrive.sendToBackend(device, response);
+
+                SimulatorController.logger.info("removing device: '{}' from simulator", deviceModel);
+                cacheV2.remove(deviceModel.getDeviceCode());
+                deviceMqttDrive.remove(device);
+                break;
+            }
             case STATUS_REQ: {
                 final DeviceModel deviceModel = getDeviceProperties(device);
                 if (deviceModel == null) {

@@ -49,7 +49,7 @@ public class UpdateRequestTest extends IntegrationTestBase {
         Assertions.assertEquals(HttpStatus.OK, simulatorApi.authorizeDevice(userId).getStatusCode());
 
         await().until(() -> {
-            final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
+            final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
             Assertions.assertNotNull(testResult);
             return testResult.getStatus() == DeviceStatus.READY;
         });
@@ -59,7 +59,7 @@ public class UpdateRequestTest extends IntegrationTestBase {
     void checkUpdateRequest() throws Exception {
         final Long userId = 19L;
         final String deviceCode = simulatorApi.getDeviceCode(userId).getBody();
-        final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
+        final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
 
         Assertions.assertNotNull(testResult);
         final Long deviceId = testResult.getId();
@@ -96,7 +96,7 @@ public class UpdateRequestTest extends IntegrationTestBase {
     void checkUpdateRequestNulls() throws Exception {
         final Long userId = 19L;
         final String deviceCode = simulatorApi.getDeviceCode(userId).getBody();
-        final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
+        final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
 
         Assertions.assertNotNull(testResult);
         final Long deviceId = testResult.getId();
