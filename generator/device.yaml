@@ -34,20 +34,33 @@ components:
         doors:
           type: boolean
         heater:
-          type: object
-          properties:
-            onOff:
-              type: boolean
-            setTemp:
-              type: number
-              format: double
+          $ref: '#/components/schemas/Heater'
+        fan:
+          type: boolean
+        humidifier:
+          type: boolean
+    Heater:
+      type: object
+      properties:
+        onOff:
+          type: boolean
+        setTemp:
+          type: number
+          format: double
+    UpdateRequest:
+      type: object
+      properties:
+        light:
+          type: boolean
+        heater:
+          $ref: '#/components/schemas/Heater'
         fan:
           type: boolean
         humidifier:
           type: boolean
     MessageType:
       type: string
-      enum: [ PING, OK, ERROR, AUTHORIZE, ENV_INFO, LIGHT_CMD, STATUS_REQ, STATUS_RESP,  ]
+      enum: [ PING, OK, ERROR, AUTHORIZE, ENV_INFO, LIGHT_CMD, STATUS_REQ, STATUS_RESP, UPDATE_REQ ]
     MqttSystemMessage:
       type: object
       properties:

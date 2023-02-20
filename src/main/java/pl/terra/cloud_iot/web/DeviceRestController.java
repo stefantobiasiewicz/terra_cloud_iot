@@ -8,6 +8,7 @@ import pl.terra.cloud_iot.domain.DeviceService;
 import pl.terra.http.api.DeviceApi;
 import pl.terra.http.model.Device;
 import pl.terra.http.model.DeviceStatus;
+import pl.terra.http.model.DeviceUpdate;
 
 import java.util.List;
 
@@ -35,5 +36,12 @@ public class DeviceRestController implements DeviceApi {
         final List<Device> devices = deviceService.getAllForUser(userId);
 
         return ResponseEntity.ok(devices);
+    }
+
+    @Override
+    public ResponseEntity<DeviceStatus> update(Long userId, Long deviceId, DeviceUpdate deviceUpdate) throws Exception {
+        DeviceRestController.logger.info("updating device properties all device for user: {}, props: '{}'", userId, deviceUpdate);
+
+        return ResponseEntity.ok(deviceService.updateDevice(userId, deviceId, deviceUpdate));
     }
 }

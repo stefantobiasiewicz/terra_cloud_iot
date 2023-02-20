@@ -2,8 +2,8 @@ package pl.terra.cloud_simulator.model;
 
 import pl.terra.common.mqtt.DeviceMqtt;
 import pl.terra.device.model.EnvInfo;
+import pl.terra.device.model.Heater;
 import pl.terra.device.model.StatusResp;
-import pl.terra.device.model.StatusRespHeater;
 
 import java.io.Serializable;
 
@@ -125,7 +125,7 @@ public class DeviceModel implements Serializable {
         final StatusResp status = new StatusResp();
         status.light(lightOnOff);
         status.setDoors(doorsOpenClose);
-        final StatusRespHeater heater = new StatusRespHeater();
+        final Heater heater = new Heater();
         heater.setOnOff(heaterOnOff);
         heater.setTemp(heaterSetTemp);
         status.setHeater(heater);

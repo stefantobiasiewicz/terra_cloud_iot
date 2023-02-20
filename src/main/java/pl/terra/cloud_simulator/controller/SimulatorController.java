@@ -19,10 +19,7 @@ import pl.terra.cloud_simulator.mqtt.DeviceMqttDriver;
 import pl.terra.cloud_simulator.mqtt.MqttDispatcher;
 import pl.terra.common.exception.SystemException;
 import pl.terra.common.mqtt.DeviceMqtt;
-import pl.terra.device.model.EnvInfo;
-import pl.terra.device.model.MessageType;
-import pl.terra.device.model.MqttSystemMessage;
-import pl.terra.device.model.StatusResp;
+import pl.terra.device.model.*;
 import pl.terra.http.model.Connection;
 
 import java.io.File;
@@ -95,6 +92,12 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
         }
     }
 
+
+    @Scheduled(fixedDelay = 10000)
+    public void saveCache() throws SystemException {
+        SimulatorController.logger.info("saving cache!");
+        configLoader.saveState(cacheV2);
+    }
 
     @Override
     @GetMapping("/device/get/all")
@@ -209,8 +212,45 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
 
                 response.setPayload(statusResponse);
                 deviceMqttDrive.sendToBackend(device, response);
+                break;
             }
-            break;
+            case UPDATE_REQ: {
+                final DeviceModel deviceModel = getDeviceProperties(device);
+                if (deviceModel == null) {
+                    return;
+                }
+
+                UpdateRequest request = DeviceMqttDriver.getPayloadClass(message, UpdateRequest.class);
+
+                if (request.getFan() != null) {
+                    deviceModel.setFanOnOff(request.getFan());
+                }
+                if (request.getHumidifier() != null) {
+                    deviceModel.setHumidifierOnOff(request.getHumidifier());
+                }
+                if (request.getLight() != null) {
+                    deviceModel.setLightOnOff(request.getLight());
+                }
+                if (request.getHeater() != null) {
+                    if(request.getHeater().getOnOff() != null) {
+                        deviceModel.setHeaterOnOff(request.getHeater().getOnOff());
+                    }
+                    if(request.getHeater().getSetTemp() != null) {
+                        deviceModel.setHeaterSetTemp(request.getHeater().getSetTemp());
+                    }
+                }
+                cacheV2.put(deviceModel.getDeviceCode(), deviceModel);
+
+                final MqttSystemMessage response = new MqttSystemMessage();
+                response.setMessageId(message.getMessageId());
+                response.setType(MessageType.STATUS_RESP);
+
+                final StatusResp statusResponse = deviceModel.asStatusResp();
+
+                response.setPayload(statusResponse);
+                deviceMqttDrive.sendToBackend(device, response);
+                break;
+            }
             default:
                 break;
         }

@@ -8,17 +8,15 @@ import org.springframework.stereotype.Component;
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
 import pl.terra.cloud_iot.jpa.repository.DeviceRepository;
 import pl.terra.cloud_iot.mqtt.ServiceMqttDriver;
-import pl.terra.cloud_iot.utils.DeviceEntityUtils;
+import pl.terra.cloud_iot.utils.MapperUtils;
 import pl.terra.common.exception.NotFoundException;
 import pl.terra.common.exception.SystemException;
 import pl.terra.common.mqtt.DeviceMqtt;
 import pl.terra.device.model.MessageType;
 import pl.terra.device.model.MqttSystemMessage;
 import pl.terra.device.model.StatusResp;
-import pl.terra.http.model.Device;
-import pl.terra.http.model.DeviceStatus;
-import pl.terra.http.model.EnvInfo;
-import pl.terra.http.model.Heater;
+import pl.terra.device.model.UpdateRequest;
+import pl.terra.http.model.*;
 
 import java.util.List;
 import java.util.Random;
@@ -39,7 +37,7 @@ public class DeviceService {
 
     public List<Device> getAllForUser(Long userId) {
         return deviceRepository.findAllByUserId(userId).stream()
-                .map(DeviceEntityUtils::mapToDevice).collect(Collectors.toList());
+                .map(MapperUtils::mapToDevice).collect(Collectors.toList());
     }
 
     public DeviceStatus getDeviceStatus(Long userId, Long deviceId) throws SystemException, JsonProcessingException {
@@ -61,24 +59,29 @@ public class DeviceService {
 
         StatusResp payload = ServiceMqttDriver.getPayloadClass(response, StatusResp.class);
 
-        final DeviceStatus result = new DeviceStatus();
-        result.setDevice(DeviceEntityUtils.mapToDevice(devices.get(0)));
-        result.setDoors(payload.getDoors());
-        result.setFan(payload.getFan());
-        result.setLight(payload.getLight());
+        return MapperUtils.mapToDeviceStatus(payload, devices.get(0));
+    }
 
-        final Heater heater = new Heater();
-        heater.setOnOff(payload.getHeater().getOnOff());
-        heater.setTemp(payload.getHeater().getSetTemp());
-        result.setHeater(heater);
-        result.setHumidifier(payload.getHumidifier());
+    public DeviceStatus updateDevice(final Long userId, final Long deviceId, final DeviceUpdate deviceUpdate) throws SystemException {
+        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndId(userId, deviceId);
 
-        final EnvInfo envInfo = new EnvInfo();
-        envInfo.setHumidity(payload.getEnvInfo().getHumidity());
-        envInfo.setPressure(payload.getEnvInfo().getPressure());
-        envInfo.setTemperature(payload.getEnvInfo().getTemperature());
-        result.setEnvInfo(envInfo);
+        if (devices.size() < 1) {
+            DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);
+            throw new NotFoundException(String.format("can't find device for userId: %s and deviceId: %s", userId, deviceId));
+        }
 
-        return result;
+        final MqttSystemMessage request = new MqttSystemMessage();
+        request.setType(MessageType.UPDATE_REQ);
+        request.setMessageId(new Random().nextLong());
+        request.setPayload(MapperUtils.mapToUpdateRequest(deviceUpdate));
+
+        DeviceMqtt device = serviceMqttDriver.getDeviceById(deviceId);
+
+        DeviceService.logger.info("requesting device: '{}' by: '{}'", device, request);
+        final MqttSystemMessage response = serviceMqttDriver.exchange(device, request, 10000L);
+
+        StatusResp payload = ServiceMqttDriver.getPayloadClass(response, StatusResp.class);
+
+        return MapperUtils.mapToDeviceStatus(payload, devices.get(0));
     }
 }
