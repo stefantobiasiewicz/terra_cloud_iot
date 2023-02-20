@@ -12,7 +12,7 @@ import pl.terra.http.model.EnvInfo;
 
 import java.net.URI;
 
-public class MapperUtils {
+public final class MapperUtils {
 
     public MapperUtils() {
         throw new IllegalStateException("utils class");

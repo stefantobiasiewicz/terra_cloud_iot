@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import pl.terra.cloud_iot.exceptions.ConflictException;
 import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
 import pl.terra.cloud_iot.jpa.repository.DeviceRepository;
 import pl.terra.cloud_iot.mqtt.ServiceMqttDriver;
@@ -48,6 +49,10 @@ public class DeviceService {
             throw new NotFoundException(String.format("can't find device for userId: %s and deviceId: %s", userId, deviceId));
         }
 
+        if(devices.get(0).getStatus() != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.READY) {
+            throw new ConflictException("device is not in state READY");
+        }
+
         final MqttSystemMessage request = new MqttSystemMessage();
         request.setType(MessageType.STATUS_REQ);
         request.setMessageId(new Random().nextLong());
@@ -69,6 +74,11 @@ public class DeviceService {
             DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);
             throw new NotFoundException(String.format("can't find device for userId: %s and deviceId: %s", userId, deviceId));
         }
+
+        if(devices.get(0).getStatus() != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.READY) {
+            throw new ConflictException("device is not in state READY");
+        }
+
 
         final MqttSystemMessage request = new MqttSystemMessage();
         request.setType(MessageType.UPDATE_REQ);
@@ -93,6 +103,11 @@ public class DeviceService {
             DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);
             throw new NotFoundException(String.format("can't find device for userId: %s and deviceId: %s", userId, deviceId));
         }
+
+        if(devices.get(0).getStatus() != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.READY) {
+            throw new ConflictException("device is not in state READY");
+        }
+
 
         final DeviceEntity deviceEntity = devices.get(0);
 
