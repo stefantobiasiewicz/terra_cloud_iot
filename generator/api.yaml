@@ -115,6 +115,42 @@ paths:
           description: Bad parameters
         '404':
           description: Device not found
+    post:
+      tags:
+        - device
+      description: Endpoint for getting info of device task -> 'Status urządzenia'
+      operationId: update
+      parameters:
+        - name: userId
+          in: path
+          description: unique ID of user
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: deviceId
+          in: path
+          description: unique ID of Device
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdate'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceStatus'
+        '400':
+          description: Bad parameters
+        '404':
+          description: Device not found
 components:
   schemas:
     Connection:
@@ -153,6 +189,25 @@ components:
           $ref: '#/components/schemas/ModelDouble'
         pressure:
           $ref: '#/components/schemas/ModelDouble'
+    Heater:
+      type: object
+      properties:
+        onOff:
+          type: boolean
+        setTemp:
+          type: number
+          format: double
+    DeviceUpdate:
+      type: object
+      properties:
+        light:
+          type: boolean
+        heater:
+          $ref: '#/components/schemas/Heater'
+        fan:
+          type: boolean
+        humidifier:
+          type: boolean
     DeviceStatus:
       type: object
       properties:
@@ -165,13 +220,7 @@ components:
         doors:
           type: boolean
         heater:
-          type: object
-          properties:
-            onOff:
-              type: boolean
-            setTemp:
-              type: number
-              format: double
+          $ref: '#/components/schemas/Heater'
         fan:
           type: boolean
         humidifier:

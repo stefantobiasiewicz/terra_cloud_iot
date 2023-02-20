@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import pl.terra.cloud_iot.TerraCloudIotApplication;
@@ -34,19 +35,17 @@ public class StatusRequestTest extends IntegrationTestBase {
     @Autowired
     DeviceRepository deviceRepository;
 
-    @Autowired
-    CollectingService collectingService;
 
     @BeforeAll
     void prepareDevices() throws Exception {
-        final Long userId = 5L;
+        final Long userId = 7L;
         final String deviceCode = simulatorApi.getDeviceCode(userId).getBody();
 
         // suer call
-        onboardingApi.addDeviceToPoolList(userId, deviceCode);
+        Assertions.assertEquals(HttpStatus.NO_CONTENT, onboardingApi.addDeviceToPoolList(userId, deviceCode).getStatusCode());
 
         //device "start onboarding button"
-        simulatorApi.authorizeDevice(userId);
+        Assertions.assertEquals(HttpStatus.OK, simulatorApi.authorizeDevice(userId).getStatusCode());
 
         await().until(() -> {
             final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
@@ -57,7 +56,7 @@ public class StatusRequestTest extends IntegrationTestBase {
 
     @Test
     void checkUserRequestDeviceForStatusData() throws Exception {
-        final Long userId = 5L;
+        final Long userId = 7L;
         final String deviceCode = simulatorApi.getDeviceCode(userId).getBody();
         final DeviceEntity testResult = deviceRepository.findByFactoryCode(deviceCode).orElse(null);
 

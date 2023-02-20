@@ -17,8 +17,8 @@ import pl.terra.device.model.MqttSystemMessage;
 import pl.terra.device.model.StatusResp;
 import pl.terra.http.model.Device;
 import pl.terra.http.model.DeviceStatus;
-import pl.terra.http.model.DeviceStatusHeater;
 import pl.terra.http.model.EnvInfo;
+import pl.terra.http.model.Heater;
 
 import java.util.List;
 import java.util.Random;
@@ -67,7 +67,7 @@ public class DeviceService {
         result.setFan(payload.getFan());
         result.setLight(payload.getLight());
 
-        final DeviceStatusHeater heater = new DeviceStatusHeater();
+        final Heater heater = new Heater();
         heater.setOnOff(payload.getHeater().getOnOff());
         heater.setTemp(payload.getHeater().getSetTemp());
         result.setHeater(heater);

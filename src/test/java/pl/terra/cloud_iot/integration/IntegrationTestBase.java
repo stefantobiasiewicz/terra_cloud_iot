@@ -4,8 +4,14 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.startupcheck.MinimumDurationRunningStartupCheckStrategy;
+import org.testcontainers.containers.startupcheck.OneShotStartupCheckStrategy;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
+
+import java.time.Duration;
 
 public abstract class IntegrationTestBase {
     public static final GenericContainer<?> MOSQUITO;
@@ -21,14 +27,17 @@ public abstract class IntegrationTestBase {
                 .withExposedPorts(1883)
                 .withCopyFileToContainer(MountableFile.forClasspathResource("mqtt/mosquitto.conf"), "/mosquitto/config/mosquitto.conf")
                 .withCopyFileToContainer(MountableFile.forClasspathResource("mqtt/mosquitto.passwd"), "/mosquitto/config/mosquitto.passwd");
+        MOSQUITO.withStartupCheckStrategy(new MinimumDurationRunningStartupCheckStrategy(Duration.ofSeconds(5)));
         MOSQUITO.start();
-
         mqttPort = MOSQUITO.getMappedPort(1883);
+
 
         POSTGRES = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
                 .withDatabaseName("cloud_iot")
                 .withUsername("postgres")
                 .withPassword("postgres");
+
+        POSTGRES.withStartupCheckStrategy(new MinimumDurationRunningStartupCheckStrategy(Duration.ofSeconds(5)));
         POSTGRES.start();
 
         postgresUrl = POSTGRES.getJdbcUrl();

@@ -47,7 +47,7 @@ components:
           type: boolean
     MessageType:
       type: string
-      enum: [ PING, OK, ERROR, AUTHORIZE, ENV_INFO, LIGHT_CMD, STATUS_REQ, STATUS_RESP ]
+      enum: [ PING, OK, ERROR, AUTHORIZE, ENV_INFO, LIGHT_CMD, STATUS_REQ, STATUS_RESP,  ]
     MqttSystemMessage:
       type: object
       properties:

@@ -18,5 +18,5 @@ public interface SimulatorApi {
 
     ResponseEntity<DeviceModel> setDeviceStatus(@RequestBody DeviceModel model);
 
-    ResponseEntity<String> authorizeDevice(Long id) throws SystemException;
+    ResponseEntity<?> authorizeDevice(Long id) throws SystemException;
 }

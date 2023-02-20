@@ -143,7 +143,7 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
 
     @Override
     @PostMapping("/device/authorize/{id}")
-    public ResponseEntity<String> authorizeDevice(@PathVariable(name = "id") final Long id) throws SystemException {
+    public ResponseEntity<?> authorizeDevice(@PathVariable(name = "id") final Long id) throws SystemException {
         final String deviceCode = devicesHardCoded.get(id);
 
         final String url = String.format("%s/device/connection/%s", serverBaseUrl, deviceCode);
@@ -178,7 +178,7 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
         deviceMqttDrive.sendToBackend(deviceMqtt, authorize);
 
         configLoader.saveState(cacheV2);
-        return null;
+        return ResponseEntity.ok(model);
     }
 
     private DeviceModel getDeviceProperties(final DeviceMqtt deviceMqtt) {

@@ -32,8 +32,8 @@ public class MqttIntegrationTest extends IntegrationTestBase {
     @Test
     void testExchangeMechanism() throws SystemException, InterruptedException {
         final DeviceMqtt testDeviceMqtt = new DeviceMqtt();
-        testDeviceMqtt.setToDeviceTopic("/to/device");
-        testDeviceMqtt.setToServiceTopic("/to/service");
+        testDeviceMqtt.setToDeviceTopic("/to/device/to");
+        testDeviceMqtt.setToServiceTopic("/to/service/to");
 
         serviceMqttDriver.registerDevice(testDeviceMqtt);
         deviceMqttDriver.registerService(testDeviceMqtt);
