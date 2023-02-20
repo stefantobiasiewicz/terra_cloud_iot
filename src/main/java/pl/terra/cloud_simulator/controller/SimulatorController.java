@@ -122,6 +122,14 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
         return ResponseEntity.ok(devicesHardCoded.get(id));
     }
 
+    @GetMapping("/device/get/code/json/{id}")
+    public ResponseEntity<?> getDeviceCodeJson(@PathVariable(name = "id") final Long id) {
+        Map<String, String> map = new HashMap<>();
+        map.put("code", devicesHardCoded.get(id));
+
+        return ResponseEntity.ok(map);
+    }
+
     @Override
     @GetMapping("/device/get/status/{id}")
     public ResponseEntity<DeviceModel> getDeviceStatus(@PathVariable(name = "id") final Long id) {
