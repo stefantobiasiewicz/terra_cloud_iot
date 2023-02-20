@@ -17,6 +17,7 @@ public interface DeviceRepository extends JpaRepository<DeviceEntity, Long> {
     @Query(value = "Select d from DeviceEntity d where d.toDeviceTopic = :toDeviceTopic and d.toServiceTopic = :toServiceTopic and d.status != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.DELETED")
     Optional<DeviceEntity> findByDeviceMqtt(@Param("toDeviceTopic") String toDeviceTopic, @Param("toServiceTopic") String toServiceTopic);
 
+    @Query(value = "Select d from DeviceEntity d where d.userId = :userId and d.status != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.DELETED")
     List<DeviceEntity> findAllByUserId(Long userId);
 
     @Query(value = "Select d from DeviceEntity d where d.userId = :userId and d.id = :deviceId and d.status != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.DELETED")
