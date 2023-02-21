@@ -55,14 +55,14 @@ public class EnvCheckTest extends IntegrationTestBase {
 
     @Test
     void testGetDeviceByCode() {
-        final DeviceEntity entity = deviceRepository.findByFactoryCodeAndActive("XW3V41AD26").orElse(null);
+        final DeviceEntity entity = deviceRepository.findByFactoryCodeAndNotDeleted("XW3V41AD26").orElse(null);
 
         Assertions.assertEquals(4, entity.getUserId());
     }
 
     @Test
     void testGetDeviceByTopics() {
-        final DeviceEntity entity = deviceRepository.findByDeviceMqtt("device/CYM0YZJVJZ", "service/CYM0YZJVJZ").orElse(null);
+        final DeviceEntity entity = deviceRepository.findByDeviceMqttAndNotDeleted("device/CYM0YZJVJZ", "service/CYM0YZJVJZ").orElse(null);
 
         Assertions.assertEquals(1, entity.getUserId());
     }

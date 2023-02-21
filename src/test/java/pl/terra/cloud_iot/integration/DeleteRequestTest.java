@@ -58,12 +58,12 @@ public class DeleteRequestTest extends IntegrationTestBase {
         Assertions.assertEquals(HttpStatus.OK, simulatorApi.authorizeDevice(userId).getStatusCode());
 
         await().until(() -> {
-            final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
+            final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndNotDeleted(deviceCode).orElse(null);
             Assertions.assertNotNull(testResult);
             return testResult.getStatus() == DeviceStatus.READY;
         });
 
-        final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
+        final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndNotDeleted(deviceCode).orElse(null);
 
         Assertions.assertNotNull(testResult);
         final Long deviceId = testResult.getId();
@@ -103,12 +103,12 @@ public class DeleteRequestTest extends IntegrationTestBase {
         Assertions.assertEquals(HttpStatus.OK, simulatorApi.authorizeDevice(userId).getStatusCode());
 
         await().until(() -> {
-            final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
+            final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndNotDeleted(deviceCode).orElse(null);
             Assertions.assertNotNull(testResult);
             return testResult.getStatus() == DeviceStatus.READY;
         });
 
-        final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
+        final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndNotDeleted(deviceCode).orElse(null);
 
         Assertions.assertNotNull(testResult);
         final Long deviceId = testResult.getId();
@@ -144,12 +144,12 @@ public class DeleteRequestTest extends IntegrationTestBase {
         Assertions.assertEquals(HttpStatus.OK, simulatorApi.authorizeDevice(userId).getStatusCode());
 
         await().until(() -> {
-            final DeviceEntity testResult2 = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
+            final DeviceEntity testResult2 = deviceRepository.findByFactoryCodeAndNotDeleted(deviceCode).orElse(null);
             Assertions.assertNotNull(testResult2);
             return testResult2.getStatus() == DeviceStatus.READY;
         });
 
-        final DeviceEntity testResult2 = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
+        final DeviceEntity testResult2 = deviceRepository.findByFactoryCodeAndNotDeleted(deviceCode).orElse(null);
 
         Assertions.assertNotNull(testResult2);
         final Long deviceId2 = testResult2.getId();
@@ -174,5 +174,40 @@ public class DeleteRequestTest extends IntegrationTestBase {
                 .get(0)
                 .isAuthorized();
         Assertions.assertFalse(authorize2);
+    }
+
+    @Test
+    @Order(300)
+    void checkDeleteInPending() throws Exception {
+        final Long userId = 89L;
+        final String deviceCode = simulatorApi.getDeviceCode(userId).getBody();
+
+        // suer call
+        Assertions.assertEquals(HttpStatus.NO_CONTENT, onboardingApi.addDeviceToPoolList(userId, deviceCode).getStatusCode());
+
+
+        await().until(() -> {
+            final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndNotDeleted(deviceCode).orElse(null);
+            Assertions.assertNotNull(testResult);
+            return testResult.getStatus() == DeviceStatus.PENDING;
+        });
+
+
+        final DeviceEntity testResult = deviceRepository.findByFactoryCodeAndNotDeleted(deviceCode).orElse(null);
+        final Long deviceId = testResult.getId();
+
+        ResponseEntity<Void> statusResponse = deviceApi.delete(userId, deviceId);
+        Assertions.assertEquals(HttpStatus.OK, statusResponse.getStatusCode());
+
+        final DeviceEntity res = deviceRepository.findByFactoryCodeAndNotDeleted(deviceCode).orElse(null);
+        Assertions.assertNull(res);
+
+        boolean authorize = simulatorApi.getAllDeviceIds().getBody()
+                .stream()
+                .filter(devicePair -> devicePair.getCode().equals(deviceCode))
+                .collect(Collectors.toList())
+                .get(0)
+                .isAuthorized();
+        Assertions.assertFalse(authorize);
     }
 }

@@ -12,19 +12,19 @@ import java.util.Optional;
 @Repository
 public interface DeviceRepository extends JpaRepository<DeviceEntity, Long> {
     @Query(value = "Select d from DeviceEntity d where d.factoryCode = :code and d.status != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.DELETED")
-    Optional<DeviceEntity> findByFactoryCodeAndActive(@Param("code") final String code);
+    Optional<DeviceEntity> findByFactoryCodeAndNotDeleted(@Param("code") final String code);
 
     @Query(value = "Select d from DeviceEntity d where d.toDeviceTopic = :toDeviceTopic and d.toServiceTopic = :toServiceTopic and d.status != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.DELETED")
-    Optional<DeviceEntity> findByDeviceMqtt(@Param("toDeviceTopic") String toDeviceTopic, @Param("toServiceTopic") String toServiceTopic);
+    Optional<DeviceEntity> findByDeviceMqttAndNotDeleted(@Param("toDeviceTopic") String toDeviceTopic, @Param("toServiceTopic") String toServiceTopic);
 
     @Query(value = "Select d from DeviceEntity d where d.userId = :userId and d.status != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.DELETED")
-    List<DeviceEntity> findAllByUserId(Long userId);
+    List<DeviceEntity> findAllByUserIdAndNotDeleted(Long userId);
 
     @Query(value = "Select d from DeviceEntity d where d.userId = :userId and d.id = :deviceId and d.status != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.DELETED")
-    List<DeviceEntity> findAllByUserIdAndIdAndActive(@Param("userId") Long userId, @Param("deviceId")  Long deviceId);
+    List<DeviceEntity> findAllByUserIdAndIdAndNotDeleted(@Param("userId") Long userId, @Param("deviceId")  Long deviceId);
 
     @Query(value = "Select d from DeviceEntity d where d.status != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.DELETED")
-    List<DeviceEntity> findAllActive();
+    List<DeviceEntity> findAllNotDeleted();
 
 //    @Query(value = "Select d from DeviceEntity d where d.userId = :userId and d.id = :deviceId and d.status != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.DELETED")
 //    List<DeviceEntity> findAllActive(@Param("userId") Long userId, @Param("deviceId")  Long deviceId);

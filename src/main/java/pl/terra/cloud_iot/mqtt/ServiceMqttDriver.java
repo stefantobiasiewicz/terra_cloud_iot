@@ -36,7 +36,7 @@ public class ServiceMqttDriver extends MqttCore {
 
     @Override
     protected void messageArrived(DeviceMqtt deviceMqtt, MqttSystemMessage message) throws SystemException {
-        DeviceEntity device = deviceRepository.findByDeviceMqtt(deviceMqtt.getToDeviceTopic(), deviceMqtt.getToServiceTopic()).orElse(null);
+        DeviceEntity device = deviceRepository.findByDeviceMqttAndNotDeleted(deviceMqtt.getToDeviceTopic(), deviceMqtt.getToServiceTopic()).orElse(null);
         if (device == null) {
             final String errorMessage = String.format("can't find device with topics: '%s' '%s'",
                     deviceMqtt.getToDeviceTopic(), deviceMqtt.getToServiceTopic());

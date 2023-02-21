@@ -37,12 +37,12 @@ public class DeviceService {
     }
 
     public List<Device> getAllForUser(Long userId) {
-        return deviceRepository.findAllByUserId(userId).stream()
+        return deviceRepository.findAllByUserIdAndNotDeleted(userId).stream()
                 .map(MapperUtils::mapToDevice).collect(Collectors.toList());
     }
 
     public DeviceStatus getDeviceStatus(Long userId, Long deviceId) throws SystemException, JsonProcessingException {
-        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndActive(userId, deviceId);
+        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndNotDeleted(userId, deviceId);
 
         if (devices.size() < 1) {
             DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);
@@ -68,7 +68,7 @@ public class DeviceService {
     }
 
     public DeviceStatus updateDevice(final Long userId, final Long deviceId, final DeviceUpdate deviceUpdate) throws SystemException {
-        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndActive(userId, deviceId);
+        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndNotDeleted(userId, deviceId);
 
         if (devices.size() < 1) {
             DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);
@@ -97,42 +97,39 @@ public class DeviceService {
 
     @Transactional
     public void delete(final Long userId, final Long deviceId) throws SystemException {
-        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndActive(userId, deviceId);
+        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndNotDeleted(userId, deviceId);
 
         if (devices.size() < 1) {
             DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);
             throw new NotFoundException(String.format("can't find device for userId: %s and deviceId: %s", userId, deviceId));
         }
 
-        if(devices.get(0).getStatus() != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.READY) {
-            throw new ConflictException("device is not in state READY");
-        }
 
 
         final DeviceEntity deviceEntity = devices.get(0);
 
-        deviceEntity.setStatus(pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.DELETED);
-        deviceRepository.save(deviceEntity);
+        if(deviceEntity.getStatus() == pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.READY) {
+            final MqttSystemMessage request = new MqttSystemMessage();
+            request.setType(MessageType.DELETE_REQ);
+            request.setMessageId(new Random().nextLong());
 
-        final MqttSystemMessage request = new MqttSystemMessage();
-        request.setType(MessageType.DELETE_REQ);
-        request.setMessageId(new Random().nextLong());
+            DeviceMqtt device = serviceMqttDriver.getDeviceById(deviceId);
 
-        DeviceMqtt device = serviceMqttDriver.getDeviceById(deviceId);
+            DeviceService.logger.info("deleting device: '{}' by: '{}'", device, request);
+            final MqttSystemMessage response = serviceMqttDriver.exchange(device, request, 10000L);
 
-        DeviceService.logger.info("deleting device: '{}' by: '{}'", device, request);
-        final MqttSystemMessage response = serviceMqttDriver.exchange(device, request, 10000L);
-
-        if(response.getType() == MessageType.OK) {
+            if(response.getType() != MessageType.OK) {
+                throw new SystemException("can't remove device");
+            }
             serviceMqttDriver.remove(device);
-            return;
         }
 
-        throw new SystemException("can't remove device");
+        deviceEntity.setStatus(pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.DELETED);
+        deviceRepository.save(deviceEntity);
     }
 
     public void setNewName(final Long userId, final Long deviceId, final String newName) throws NotFoundException {
-        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndActive(userId, deviceId);
+        final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndNotDeleted(userId, deviceId);
 
         if (devices.size() < 1) {
             DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);

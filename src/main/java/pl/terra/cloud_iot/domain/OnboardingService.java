@@ -28,7 +28,7 @@ public class OnboardingService {
         this.serviceMqttDriver = serviceMqttDriver;
         this.deviceRepository = deviceRepository;
 
-        final List<DeviceEntity> deviceEntityList = deviceRepository.findAllActive();
+        final List<DeviceEntity> deviceEntityList = deviceRepository.findAllNotDeleted();
 
         for (final DeviceEntity entity : deviceEntityList) {
             final DeviceMqtt deviceMqtt = new DeviceMqtt();
@@ -50,7 +50,7 @@ public class OnboardingService {
     public void addToPool(final Long userId, final String deviceCode) throws SystemException {
         OnboardingService.logger.debug(String.format("Adding device to pool list with userId: %d and device code: '%s'", userId, deviceCode));
 
-        if (deviceRepository.findByFactoryCodeAndActive(deviceCode).isPresent()) {
+        if (deviceRepository.findByFactoryCodeAndNotDeleted(deviceCode).isPresent()) {
             throw new AlreadyExistException(String.format("device with code: '%s' already exist", deviceCode));
         }
 
@@ -74,7 +74,7 @@ public class OnboardingService {
     public Connection getConnection(final String deviceCode) throws NotFoundException {
         OnboardingService.logger.debug(String.format("getting device connection for device code: '%s'", deviceCode));
 
-        final DeviceEntity device = deviceRepository.findByFactoryCodeAndActive(deviceCode).orElse(null);
+        final DeviceEntity device = deviceRepository.findByFactoryCodeAndNotDeleted(deviceCode).orElse(null);
         if (device == null) {
             throw new NotFoundException(String.format("can't find device with device code: %s", deviceCode));
         }
