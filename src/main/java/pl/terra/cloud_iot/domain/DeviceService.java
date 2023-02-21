@@ -171,7 +171,7 @@ public class DeviceService {
 
         final DeviceEntity deviceEntity = devices.get(0);
 
-        final List<EnvInfoEntity> entities = envInfoRepository.findAllByDevice(deviceEntity, PageRequest.of(page.intValue(), 30));
+        final List<EnvInfoEntity> entities = envInfoRepository.findAllByDevice(deviceEntity, PageRequest.of(page.intValue(), 30, Sort.by("id").descending()));
 
         return entities.stream().map(envInfoEntity -> {
             final EnvInfoDate envInfo = new EnvInfoDate();
