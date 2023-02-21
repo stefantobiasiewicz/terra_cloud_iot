@@ -218,6 +218,47 @@ paths:
           description: Bad parameters
         '404':
           description: Device not found
+  /device/env/{userId}/{deviceId}:
+    get:
+      tags:
+        - device
+      description: get device env info data in page of 30
+      operationId: getEnvInfo
+      parameters:
+        - name: userId
+          in: path
+          description: unique ID of user
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: deviceId
+          in: path
+          description: unique ID of Device
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          description: pageNumber
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EnvInfoDate'
+        '400':
+          description: Bad parameters
+        '404':
+          description: Device not found
 components:
   schemas:
     Connection:
@@ -258,6 +299,18 @@ components:
           $ref: '#/components/schemas/ModelDouble'
         pressure:
           $ref: '#/components/schemas/ModelDouble'
+    EnvInfoDate:
+      type: object
+      properties:
+        temperature:
+          $ref: '#/components/schemas/ModelDouble'
+        humidity:
+          $ref: '#/components/schemas/ModelDouble'
+        pressure:
+          $ref: '#/components/schemas/ModelDouble'
+        createdAt:
+          type: string
+          format: date-time
     Heater:
       type: object
       properties:

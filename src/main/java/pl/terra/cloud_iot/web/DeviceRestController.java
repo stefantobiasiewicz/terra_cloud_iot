@@ -7,10 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import pl.terra.cloud_iot.domain.DeviceService;
 import pl.terra.http.api.DeviceApi;
-import pl.terra.http.model.Device;
-import pl.terra.http.model.DeviceStatus;
-import pl.terra.http.model.DeviceUpdate;
-import pl.terra.http.model.InlineObject;
+import pl.terra.http.model.*;
 
 import java.util.List;
 
@@ -55,11 +52,17 @@ public class DeviceRestController implements DeviceApi {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-
     @Override
     public ResponseEntity<DeviceStatus> setNewName(Long userId, Long deviceId, InlineObject inlineObject) throws Exception {
         DeviceRestController.logger.info("setting new name for device: {} for user: {} and new name: {}", deviceId, userId, inlineObject.getName());
 
         return ResponseEntity.ok(deviceService.setNewName(userId, deviceId, inlineObject.getName()));
+    }
+
+    @Override
+    public ResponseEntity<List<EnvInfoDate>> getEnvInfo(Long userId, Long deviceId, Long page) throws Exception {
+        DeviceRestController.logger.info("getting new name for device: {} for user: {} and page: {}", deviceId, userId, page);
+
+        return ResponseEntity.ok(deviceService.getEnvInfoForDevice(userId, deviceId, page));
     }
 }
