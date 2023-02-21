@@ -61,7 +61,7 @@ public class DeviceRestController implements DeviceApi {
 
     @Override
     public ResponseEntity<List<EnvInfoDate>> getEnvInfo(Long userId, Long deviceId, Long page) throws Exception {
-        DeviceRestController.logger.info("getting new name for device: {} for user: {} and page: {}", deviceId, userId, page);
+        DeviceRestController.logger.info("getting Enf info for device: {} for user: {} and page: {}", deviceId, userId, page);
 
         return ResponseEntity.ok(deviceService.getEnvInfoForDevice(userId, deviceId, page));
     }

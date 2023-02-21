@@ -17,6 +17,7 @@ import pl.terra.cloud_simulator.dto.DevicePair;
 import pl.terra.cloud_simulator.model.DeviceModel;
 import pl.terra.cloud_simulator.mqtt.DeviceMqttDriver;
 import pl.terra.cloud_simulator.mqtt.MqttDispatcher;
+import pl.terra.cloud_simulator.rng.RngGenerator;
 import pl.terra.common.exception.SystemException;
 import pl.terra.common.mqtt.DeviceMqtt;
 import pl.terra.device.model.*;
@@ -79,12 +80,50 @@ public class SimulatorController implements SimulatorApi, MqttDispatcher {
             message.setType(MessageType.ENV_INFO);
 
 
+            if (deviceConfig.isHeaterOnOff()) {
+                final Double setTemp = deviceConfig.getHeaterSetTemp();
+
+                Double delta = setTemp - deviceConfig.getTemperature();
+
+                delta = delta * RngGenerator.getRandom01() * 0.2;
+
+                deviceConfig.setTemperature(deviceConfig.getTemperature() + delta);
+            } else {
+                final Double setTemp = 22.0;
+
+                Double delta = setTemp - deviceConfig.getTemperature();
+
+                delta = delta * RngGenerator.getRandom01() * 0.2;
+
+                deviceConfig.setTemperature(deviceConfig.getTemperature() + delta);
+            }
+
+            if (deviceConfig.isHumidifierOnOff()) {
+                Double delta = RngGenerator.getRandom01();
+
+                Double result = deviceConfig.getHumidity() + delta;
+                if(result >= 100) {
+                    result = 100.0;
+                }
+
+                deviceConfig.setHumidity(result);
+            } else {
+                Double delta = RngGenerator.getRandom01();
+
+                Double result = deviceConfig.getHumidity() - delta;
+                if(result <= 20) {
+                    result = 20.0;
+                }
+
+                deviceConfig.setHumidity(result);
+            }
+
             final EnvInfo envInfo = new EnvInfo();
-            envInfo.setTemperature(deviceConfig.getTemperature());
+            envInfo.setTemperature(deviceConfig.getTemperature(RngGenerator.getNoise()));
 
-            envInfo.setHumidity(deviceConfig.getHumidity());
+            envInfo.setHumidity(deviceConfig.getHumidity(RngGenerator.getNoise()));
 
-            envInfo.setPressure(deviceConfig.getPressure());
+            envInfo.setPressure(deviceConfig.getPressure(RngGenerator.getNoise()));
 
             message.setPayload(envInfo);
 

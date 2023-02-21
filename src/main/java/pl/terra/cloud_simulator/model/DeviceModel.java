@@ -93,6 +93,11 @@ public class DeviceModel implements Serializable {
         return temperature;
     }
 
+    public double getTemperature(final Double noise) {
+        temperature = temperature + noise;
+        return temperature;
+    }
+
     public void setTemperature(double temperature) {
         this.temperature = temperature;
     }
@@ -101,11 +106,20 @@ public class DeviceModel implements Serializable {
         return pressure;
     }
 
+    public double getPressure(double noise) {
+        pressure = pressure + noise;
+        return pressure;
+    }
+
     public void setPressure(double pressure) {
         this.pressure = pressure;
     }
 
     public double getHumidity() {
+        return humidity;
+    }
+    public double getHumidity(final Double noise) {
+        humidity = humidity + noise;
         return humidity;
     }
 
