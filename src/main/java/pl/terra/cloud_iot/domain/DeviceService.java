@@ -11,6 +11,7 @@ import pl.terra.cloud_iot.jpa.entity.DeviceEntity;
 import pl.terra.cloud_iot.jpa.repository.DeviceRepository;
 import pl.terra.cloud_iot.mqtt.ServiceMqttDriver;
 import pl.terra.cloud_iot.utils.MapperUtils;
+import pl.terra.cloud_iot.web.DeviceRestController;
 import pl.terra.common.exception.NotFoundException;
 import pl.terra.common.exception.SystemException;
 import pl.terra.common.mqtt.DeviceMqtt;
@@ -135,6 +136,9 @@ public class DeviceService {
             DeviceService.logger.error("can't find device for userId: {} and deviceId: {}", userId, deviceId);
             throw new NotFoundException(String.format("can't find device for userId: %s and deviceId: %s", userId, deviceId));
         }
+
+        DeviceService.logger.info("setNewName device: {} for user: {} and new name: {}", deviceId, userId, newName);
+
 
         final DeviceEntity deviceEntity = devices.get(0);
 
