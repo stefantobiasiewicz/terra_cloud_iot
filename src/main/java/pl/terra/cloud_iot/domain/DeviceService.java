@@ -129,7 +129,7 @@ public class DeviceService {
         deviceRepository.save(deviceEntity);
     }
 
-    public void setNewName(final Long userId, final Long deviceId, final String newName) throws NotFoundException {
+    public DeviceStatus setNewName(final Long userId, final Long deviceId, final String newName) throws SystemException, JsonProcessingException {
         final List<DeviceEntity> devices = deviceRepository.findAllByUserIdAndIdAndNotDeleted(userId, deviceId);
 
         if (devices.size() < 1) {
@@ -145,5 +145,10 @@ public class DeviceService {
         deviceEntity.setName(newName);
 
         deviceRepository.save(deviceEntity);
+
+        if(deviceEntity.getStatus() == pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.READY) {
+            return getDeviceStatus(userId,deviceId);
+        }
+        return null;
     }
 }
