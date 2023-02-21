@@ -136,10 +136,6 @@ public class DeviceService {
             throw new NotFoundException(String.format("can't find device for userId: %s and deviceId: %s", userId, deviceId));
         }
 
-        if(devices.get(0).getStatus() != pl.terra.cloud_iot.jpa.entity.enums.DeviceStatus.READY) {
-            throw new ConflictException("device is not in state READY");
-        }
-
         final DeviceEntity deviceEntity = devices.get(0);
 
         deviceEntity.setName(newName);
